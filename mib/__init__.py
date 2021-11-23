@@ -90,7 +90,6 @@ def register_test_blueprints(app):
     from mib.views.utils import utils
     app.register_blueprint(utils)
 
-
 def register_handlers(app):
     """
     This function registers all handlers to application

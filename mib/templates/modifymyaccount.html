@@ -1,12 +1,12 @@
 {% extends "base.html"%}
 {%block content %}
-    <h1>Login</h1>
-  <form action="" method="POST">
+<h1>Modify your data</h1>
+<form action="" method="POST">
     {{ form.hidden_tag() }}
     <dl>
      {% for field in form.display %}
      <dt>{{ form[field].label }}</dt>
-     <dd>{{ form[field]() }}</dd>
+     <dd>{{ form[field]()  }}</dd>
        {% if form[field].errors %}
           {% for e in form[field].errors %}
            <p class="help-block">{{ e }}</p>
@@ -14,8 +14,10 @@
        {% endif %}
      {% endfor %}
     </dl>
-    <p>
-    <input type=submit value="Login" class="btn btn-primary">
+    <p>{{error}}</p>
+    <div>
+      <input type=submit value="Apply Changes" class="btn btn-primary">
+      <i class = "icon icon-edit"></i>
+    </div>
   </form>
-  <p> {{error}} </p>
 {%endblock%}

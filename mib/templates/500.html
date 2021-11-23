@@ -1,16 +1,4 @@
-{% extends "base.html" %}
-{% from 'bootstrap/wtf.html' import form_field %}
-
-{% block title %} 500 Page {% endblock %}
-
-{% block content %}
-
-<h1>Server Error</h1><br>
-<p>
-<h3>We have encountered a server error.</h3>
-
-<p>
-    <a href="{{ url_for('home.index') }}">Go somewhere nice</a>
-</p>
-
+{% extends "base.html"%}
+{%block content %}
+   500 error {% endif %}
 {% endblock %}

@@ -1,11 +1,45 @@
-from flask import Blueprint, render_template
+from datetime import date, datetime
+from flask import Blueprint, render_template, request
+from flask.wrappers import Response
+from werkzeug.utils import redirect 
 
+
+
+from mib.auth.auth import current_user
+import json
 home = Blueprint('home', __name__)
 
+_new_msg=0
 
-@home.route('/', methods=['GET', 'POST'])
+#home page
+@home.route('/')
 def index():
-    """General route for the index page
-    """
-    return render_template("index.html")
+    if current_user is not None and hasattr(current_user, 'id'):
+        welcome = "Logged In!"
+    else:
+        welcome = None
+    return render_template("index.html", welcome=welcome,new_msg=_new_msg)
 
+""""
+# Route to download an image an show it on the page    
+@home.route('/image/<int:id>')
+def download_images(id):
+    _image = db.session.query(Images).filter(Images.id == id).first()
+    return Response(_image.image, mimetype=_image.mimetype)
+
+# Route to send messages
+@home.route('/message/send')
+def message_send():
+    if current_user is not None and hasattr(current_user, 'id'):
+        return render_template("message_send_response.html",new_msg=6)
+    else:
+        return redirect('/')
+
+# Route to draft messages
+@home.route('/message/draft')
+def message_reject():
+    if current_user is not None and hasattr(current_user, 'id'):
+        return render_template("message_draft_response.html",new_msg=6)
+    else:
+        return redirect('/')
+"""

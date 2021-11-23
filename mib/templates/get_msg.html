@@ -1,0 +1,54 @@
+{% extends "base.html"%}
+{%block content %}
+    <h1>Mail box </h1>
+    <table class="table">
+      <tbody>
+        {% for message in messages: %}
+        {% if message.read %}
+        <tr style="background: #ececec;color: gray;" class="c-hand" id="{{message.id}}" onclick="openmessage(this)">
+          <td><div class="tile tile-centered">
+            <div class="tile-icon">
+              <div class="example-tile-icon">
+                <i class="icon icon-2x icon-mail"></i>
+              </div>
+            </div>
+            <div class="tile-content">
+              <div class="tile-title">{{message.title}}</div>
+              <small class="tile-subtitle text-gray">{{message.sender}}</small>
+            </div>
+            <div class="tile-action">
+              {{message.date_of_delivery}}
+            </div>
+          </div></td>
+        </tr>
+      {% else %}
+           <tr style="font-weight: bold;" class="c-hand" id="{{message.id}}" onclick="openmessage(this)">
+          <td>
+            <div class="tile tile-centered">
+              <div class="tile-icon">
+                <div class="example-tile-icon">
+                  <i class="icon icon-2x icon-mail"></i>
+                </div>
+              </div>
+              <div class="tile-content">
+                <div class="tile-title">{{message.title}}</div>
+                <small class="tile-subtitle text-gray">{{message.firstname}}</small>
+              </div>
+              <div class="tile-action">
+                {{message.date_of_delivery}}
+              </div>
+            </div>
+          </td>
+        </tr>
+        {% endif %}
+        {% endfor %}
+      </tbody>
+    </table>
+    {%endblock%}
+    {%block script%}
+    <script>
+     function openmessage(e){
+      window.location.replace("/message/"+e.id)
+     }
+    </script>
+    {%endblock%}
