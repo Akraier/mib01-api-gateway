@@ -3,7 +3,7 @@ import bcrypt
 from mib.auth.auth import current_user
 
 from json import dumps
-
+from mib.forms import UserForm
 import datetime
 from datetime import date, timedelta
 from datetime import datetime as dt_
