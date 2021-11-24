@@ -14,41 +14,64 @@ users = Blueprint('users', __name__)
 
 _new_msg = 2
 
+#LOGIC SHOULD BE DONE - TO TEST
 @users.route('/users')
 def _users():
     #Filtering only registered users
+    _users = UserManager.get_all_users()
     if current_user is not None and hasattr(current_user, 'id'):
         #Show all users except current user and show also the button to add a user into the blacklist
-        _users = db.session.query(User).filter(User.is_active==True).filter(User.id != current_user.id)
+        #Removing the current user from the list 
+        for user in _users:
+            if user.id == current_user.id:
+                _users.remove(user)
+        #db.session.query(User).filter(User.is_active==True).filter(User.id != current_user.id)
         return render_template("users.html", users=_users,logged = True)
-    else:
-        _users = db.session.query(User).filter(User.is_active==True)
+    else: # Showing all the active users
         return render_template("users.html", users=_users,logged = False)
 
+
+#LOGIC SHOULD BE DONE - TO TEST
 @users.route('/users/start/<s>')
 def _users_start(s):
     #Select the first user in the db with firstname starting by "s", used in search bar for message sending
-    users = db.session.query(User).filter(User.is_active==True).filter(User.firstname.startswith(s)).limit(2).all()
+    users = UserManager.get_all_users() #db.session.query(User).filter(User.is_active==True).filter(User.firstname.startswith(s)).limit(2).all()
+    
+    #Filtering the list of users
+    count_limit = 0 # to show only the first N (in this case 2) users
+    for usr in users:
+        if usr.is_active == False:
+            users.remove(usr)
+        if usr.firstname.startswith(s) == False:
+            users.remove(usr)
+        if count_limit == 1:
+            break
+        else:
+            count_limit += 1
+            
     if (len(users)>0):
         return dumps({'id':users[0].id,'firstname' : users[0].firstname,'lastname':users[0].lastname,'email':users[0].email})
     else:
         return dumps({})
 
+
+#LOGIC SHOULD BE DONE - TO TEST
 @users.route('/myaccount', methods=['DELETE', 'GET'])
 def myaccount():
     if request.method == 'DELETE':
         #delete the account just deactivating the is_active field into the database
         if current_user is not None and hasattr(current_user, 'id'):
             #delete only if the user exist
-            _user = db.session.query(User).filter(User.id == current_user.id).first()
-            _user.is_active=False
-            #delete all messages?
-            db.session.commit()
+            #_user = db.session.query(User).filter(User.id == current_user.id).first()
+            #_user.is_active=False
+            #db.session.commit()
+            UserManager.delete_user(current_user.id) # retrieve the current user
             return redirect("/logout",code=303)
     elif request.method == 'GET':
         #get my account info
         if current_user is not None and hasattr(current_user, 'id'):
-            content = db.session.query(User.filter_isactive).filter(User.id==current_user.id).first()
+            usr = UserManager.get_user_by_id(current_user.id)#db.session.query(User.filter_isactive).filter(User.id==current_user.id).first()
+            # TO ADD : content = usr.filter_isactive 
             s = ""
             #get the status of the content filter button to show it into the web page
             if content[0]==True:
@@ -75,7 +98,7 @@ def modify_data():
     if request.method == 'POST':
         if form.validate_on_submit():
             #get the user row
-            usr = db.session.query(User).filter(User.id == current_user.id).first()
+            usr = UserManager.get_usr_by_id(current_user.id) #db.session.query(User).filter(User.id == current_user.id).first()
             #check current password
             verified = bcrypt.checkpw(form.password.data.encode('utf-8'), usr.password)
             if verified:    #to change data values current user need to insert the password
@@ -84,7 +107,7 @@ def modify_data():
                     usr.set_password(form.newpassword.data)
                 
                 #check that users changed this account email with another already used by another
-                email_check = db.session.query(User.email).filter(User.email == form.email.data).filter(User.email != current_user.email).first()
+                email_check = UserManager.get_usr_by_email(form.email.data).first()#db.session.query(User.email).filter(User.email == form.email.data).filter(User.email != current_user.email).first()
                 if email_check is None:
                     usr.email = form.email.data
                 else:

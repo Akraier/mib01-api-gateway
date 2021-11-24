@@ -181,3 +181,26 @@ class UserManager:
                 'Microservice users returned an invalid status code %s, and message %s'
                 % (response.status_code, json_response['error_message'])
             )
+
+
+    #Method to retrieve all the active users in the database
+    @classmethod
+    def get_all_users(cls) -> User:
+        """
+        This method contacts the users microservice
+        and retrieves all user object.
+        :return: User obj with id=user_id
+        """
+        try:
+            response = requests.get("%s/user" % (cls.USERS_ENDPOINT), timeout=cls.REQUESTS_TIMEOUT_SECONDS)
+            json_payload = response.json()
+            if response.status_code == 200:
+                #user is authenticated
+                user = User.build_from_json(json_payload)
+            else:
+                raise RuntimeError('Server has sent an unrecognized status code %s' % response.status_code)
+
+        except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
+            return abort(500)
+
+        return user
