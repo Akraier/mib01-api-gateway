@@ -128,22 +128,24 @@ def set_content():
             get_data = json.loads(request.data)
             if(get_data['content']=="Active"):
                 #Setting to True the field in DB
-                stmt = (
+                UserManager.set_content_filter(current_user.id,True) # TO IMPLEMENT IN OTHER FILES
+                '''stmt = (
                     update(User).
                     where(User.id==current_user.id).
                     values(filter_isactive=True)
                     )
                 db.session.execute(stmt)
-                db.session.commit()
+                db.session.commit()'''
             else:
                 #Setting to False the field in DB
-                stmt = (
+                UserManager.set_content_filter(current_user.id,False) # TO IMPLEMENT IN OTHER FILES
+                '''stmt = (
                     update(User).
                     where(User.id==current_user.id).
                     values(filter_isactive=False)
                 )
                 db.session.execute(stmt)
-                db.session.commit()
+                db.session.commit()'''
         
             return '{"message":"OK"}'
     else:
