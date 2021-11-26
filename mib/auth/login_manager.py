@@ -12,7 +12,6 @@ def init_login_manager(app):
         """
         We need to connect to users endpoint and load the user.
         Here we can implement the redis caching
-
         :param user_id: user id
         :return: the user object
         """

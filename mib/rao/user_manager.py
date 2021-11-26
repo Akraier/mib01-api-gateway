@@ -54,27 +54,6 @@ class UserManager:
 
         return user
 
-    @classmethod
-    def get_user_by_phone(cls, user_phone: str) -> User:
-        """
-        This method contacts the users microservice
-        and retrieves the user object by user phone.
-        :param user_phone: the user phone
-        :return: User obj with phone=user_phone
-        """
-        try:
-            response = requests.get("%s/user_phone/%s" % (cls.USERS_ENDPOINT, user_phone),
-                                    timeout=cls.REQUESTS_TIMEOUT_SECONDS)
-            json_payload = response.json()
-            user = None
-
-            if response.status_code == 200:
-                user = User.build_from_json(json_payload)
-
-        except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
-            return abort(500)
-
-        return user
 
     @classmethod
     def create_user(cls,
@@ -181,3 +160,26 @@ class UserManager:
                 'Microservice users returned an invalid status code %s, and message %s'
                 % (response.status_code, json_response['error_message'])
             )
+
+
+    #Method to retrieve all the active users in the database
+    @classmethod
+    def get_all_users(cls) -> User:
+        """
+        This method contacts the users microservice
+        and retrieves all user object.
+        :return: User obj with id=user_id
+        """
+        try:
+            response = requests.get("%s/user" % (cls.USERS_ENDPOINT), timeout=cls.REQUESTS_TIMEOUT_SECONDS)
+            json_payload = response.json()
+            if response.status_code == 200:
+                #we have to build a list of User obj
+                print(json_payload)
+                list_user = json_payload
+            else:
+                raise RuntimeError('Server has sent an unrecognized status code %s' % response.status_code)
+        except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
+            return abort(500)
+
+        return list_user

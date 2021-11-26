@@ -1,29 +1,21 @@
-{% extends "base.html" %}
-{% from 'bootstrap/wtf.html' import form_field %}
+{% extends "base.html"%}
+{%block content %}
+    <h1>Create a account</h1>
+  <form action="" method="POST">
+    {{ form.hidden_tag() }}
+    <dl>
+     {% for field in form.display %}
+     <dt>{{ form[field].label }}</dt>
+     <dd>{{ form[field]() }}</dd>
+       {% if form[field].errors %}
+          {% for e in form[field].errors %}
+           <p class="help-block">{{ e }}</p>
+          {% endfor %}
+       {% endif %}
+     {% endfor %}
+    </dl>
+    <input type=submit value="Register" class="btn btn-primary">
+  </form>
+  <p> {{error}} </p>
+{%endblock%}
 
-{% block title %} Sign up {% endblock %}
-
-{% block content %}
-    <div class="row">
-        <div class="col-md-12">
-            <h2 class="display-4">Sign up</h2>
-        </div>
-    </div>
-    <div class="row">
-        <div class="col-md-8">
-            <form action="" method="POST">
-                {{ form.hidden_tag() }}
-
-                {% for field in form.display %}
-                    {{ form_field(form[field]) }}
-                {% endfor %}
-                <input type=submit value="Signup" class="btn btn-primary">
-            </form>
-        </div>
-    </div>
-
-
-{% endblock %}
-
-{% block footer %}
-{% endblock %}
