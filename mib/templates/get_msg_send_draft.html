@@ -1,0 +1,66 @@
+{% extends "base.html"%}
+{%block content %}
+    <h1>Sender and draft message </h1>
+    <h2>Draft</h2>
+    <table class="table">
+      <tbody>
+        {% for message in draft: %}
+        
+        <tr style="font-weight: bold;" class="c-hand" id="{{message.id}}" onclick="edit(this)">
+          <td><div class="tile tile-centered">
+            <div class="tile-icon">
+              <div class="example-tile-icon">
+                <i class="icon icon-2x icon-edit"></i>
+              </div>
+            </div>
+            <div class="tile-content">
+              {% if message.title=="" %}<div class="tile-title">No title specified</div>
+              {% else %}<div class="tile-title">{{message.title}}</div>{% endif %}
+            </div>
+            <div class="tile-action">
+              {{message.date_of_delivery}}
+            </div>
+          </div></td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    <h2>Message send</h2>
+    <table class="table">
+      <tbody>
+        {% for message in send%}
+           <tr style="font-weight: bold;" class="c-hand" id="{{message.id}}" onclick="view_msg(this)">
+          <td>
+            <div class="tile tile-centered">
+              <div class="tile-icon">
+                <div class="example-tile-icon">
+                  <i class="icon icon-2x icon-forward"></i>
+                </div>
+              </div>
+              <div class="tile-content">
+                <div class="tile-title">{{message.title}}</div>
+                
+              </div>
+              <div class="tile-action">
+                {{message.date_of_delivery}}
+              </div>
+            </div>
+          </td>
+        </tr>
+        
+        {% endfor %}
+      </tbody>
+    </table>
+    <p>{{action}}</p>
+    {%endblock%}
+{%block script %}
+    <script>
+     function edit(e){
+      window.location.replace("/edit/"+e.id)
+     }
+     function view_msg(e){
+      window.location.replace("/message/view_send/"+e.id)
+     }
+    </script>    
+
+{%endblock%}

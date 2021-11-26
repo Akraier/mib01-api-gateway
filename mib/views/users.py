@@ -1,5 +1,5 @@
-from flask import Blueprint, redirect, render_template, url_for, flash
-from flask_login import (login_user, login_required)
+from flask import Blueprint, redirect, render_template, url_for, flash, request
+from flask_login import (login_user, login_required, current_user)
 
 from mib.forms import UserForm
 from mib.rao.user_manager import UserManager
@@ -74,3 +74,28 @@ def delete_user(id):
         
     return redirect(url_for('home.index'))
 
+@users.route('/blacklist',methods=['GET','DELETE'])
+#@login_required
+def get_blacklist():
+    if request.method == 'GET':
+        #get blacklist of current user
+        response = UserManager.get_user_by_id(current_user.id)
+        if response.status_code != 200:
+            flash("Error while getting the blacklist")
+            return render_template('black_list.html',action="Error while retrieving blacklist",black_list=[])
+        data = response.json()
+        return render_template('black_list.html',action="This is your blacklist",black_list=data['extra'])
+    elif request.method == 'DELETE':
+        #Clear the whole blacklist
+        pass
+        #black_list = db.session.query(blacklist.c.user_id).filter(blacklist.c.user_id==current_user.id).first()
+        #if black_list is not None:
+        #    #clear only if the blacklist is not empty
+        #    st = blacklist.delete().where(blacklist.c.user_id == current_user.id)
+        #    db.session.execute(st)   
+        #    db.session.commit()
+        #    black_list = db.session.query(blacklist).filter(blacklist.c.user_id == current_user.id)
+        #
+        #    return render_template('black_list.html',action="Your blacklist is now empty",black_list=black_list,new_msg=_new_msg)
+        #else:
+        #    return render_template('black_list.html',action="Your blacklist is already empty",black_list=[],new_msg=_new_msg)

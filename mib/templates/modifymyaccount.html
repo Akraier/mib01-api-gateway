@@ -1,0 +1,23 @@
+{% extends "base.html"%}
+{%block content %}
+<h1>Modify your data</h1>
+<form action="" method="POST">
+    {{ form.hidden_tag() }}
+    <dl>
+     {% for field in form.display %}
+     <dt>{{ form[field].label }}</dt>
+     <dd>{{ form[field]()  }}</dd>
+       {% if form[field].errors %}
+          {% for e in form[field].errors %}
+           <p class="help-block">{{ e }}</p>
+          {% endfor %}
+       {% endif %}
+     {% endfor %}
+    </dl>
+    <p>{{error}}</p>
+    <div>
+      <input type=submit value="Apply Changes" class="btn btn-primary">
+      <i class = "icon icon-edit"></i>
+    </div>
+  </form>
+{%endblock%}

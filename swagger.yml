@@ -187,3 +187,19 @@ paths:
         responses:
           302:
             description: User deleted, it redirects to the index page
+  
+  /blacklist:
+    get:
+      description: Retrieve the blacklist of the user
+      tags:
+        - User
+      responses:
+        200:
+          description: Renders the updated black_list template
+    delete:
+      summary: Delete the blacklist of the user
+      responses:
+        200:
+          description: Renders the updated black_list template
+      tags:
+        - User

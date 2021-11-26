@@ -1,0 +1,77 @@
+{% extends "base.html"%}
+{%block content %}
+    <div class="panel">
+      <div class="panel-header text-center">
+        <figure ><i class="icon icon-people"></i></figure>
+        <div class="panel-title h5 mt-10">Blacklist of {{ current_user.firstname }}</div>
+        <div class="panel-title h5 mt-10">{{action}}</div>
+        <button class="btn btn-secondary" onclick = "removeBlacklist()">
+          <label>clean all</label>
+          <i class="icon icon-delete"></i> 
+        </button>
+      </div>
+      <div class="divider text-center" data-content="Informations"></div>
+      <div class="panel-body">
+        {%for user in black_list%}
+          <div class="tile">
+            <div class="tile-content">
+              <div class="tile-title text-bold">{{user.firstname}}</div>
+              <div class="tile-subtitle">email: {{ user.email }}<br></div>
+              <div class="tile-subtitle">id: {{ user.id }}<br></div>
+            </div>
+            <div class="tile-action">
+              <button class="btn btn-secondary btn-sm" id = "{{user.id}}" onclick = "removeFromBlacklist(id)">
+                <label>Release</label>
+                <i class="icon icon-refresh"></i> 
+              </button>
+            </div>
+          </div>
+          <br>
+        {%endfor%}
+      </div>
+    </div>
+    {% endblock%}
+    {%block script %}
+<script>
+
+function removeBlacklist(){
+    var xmlHttp = new XMLHttpRequest();
+    theUrl = '/blacklist';
+    xmlHttp.open( "DELETE", theUrl, false);
+    xmlHttp.send(null);
+    window.location.reload();
+  };
+
+  /*
+  function removeBlacklist(){
+    fetch('/blacklist', {
+      method: 'DELETE',
+      redirect: 'follow'
+    }).then(response => {
+      if (response.redirected) {
+        window.location.reload();
+      }
+    })
+  }
+
+  function removeFromBlacklist(id){
+    fetch('/blacklist/'+id, {
+      method: 'DELETE',
+      redirect: 'follow'
+    }).then(response => {
+      if (response.redirected) {
+        window.location.replace();
+      }
+    })
+  }*/
+
+  function removeFromBlacklist(id){
+    var xmlHttp = new XMLHttpRequest();
+    theUrl = `/blacklist/${id}`;
+    xmlHttp.open( "DELETE", theUrl, false);
+    xmlHttp.send(null);
+    window.location.reload();
+  };
+
+</script>
+{%endblock%}
