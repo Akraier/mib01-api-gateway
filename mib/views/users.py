@@ -1,7 +1,8 @@
 from flask import Blueprint, redirect, render_template, request, abort
+from flask_login import login_required
 import bcrypt
 from mib.auth.auth import current_user
-
+from mib.rao.user_manager import UserManager
 from json import dumps
 from mib.forms import UserForm
 import datetime
@@ -12,23 +13,15 @@ import json
 
 users = Blueprint('users', __name__)
 
-_new_msg = 2
+
 
 #LOGIC SHOULD BE DONE - TO TEST
 @users.route('/users')
+#@login_required
 def _users():
     #Filtering only registered users
     _users = UserManager.get_all_users()
-    if current_user is not None and hasattr(current_user, 'id'):
-        #Show all users except current user and show also the button to add a user into the blacklist
-        #Removing the current user from the list 
-        for user in _users:
-            if user.id == current_user.id:
-                _users.remove(user)
-        #db.session.query(User).filter(User.is_active==True).filter(User.id != current_user.id)
-        return render_template("users.html", users=_users,logged = True)
-    else: # Showing all the active users
-        return render_template("users.html", users=_users,logged = False)
+    return render_template("users.html", users=_users,logged = False)
 
 
 #LOGIC SHOULD BE DONE - TO TEST

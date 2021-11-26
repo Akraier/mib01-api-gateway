@@ -113,7 +113,7 @@ paths:
       responses:
         302:
           description: Redirects to the homepage
-  /user/:
+  /users: #mofify the description
     get:
       tags: [ User ]
       summary: This method allows to retrieve the sign up page for a new user
