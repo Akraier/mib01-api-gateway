@@ -68,8 +68,8 @@ class UserManager:
                                          'password': password,
                                          'firstname': firstname,
                                          'lastname': lastname,
-                                         'birthdate': birthdate,
-                                         'phone': phone
+                                         'birthdate': str(birthdate),
+                                         #'phone': phone
                                      },
                                      timeout=cls.REQUESTS_TIMEOUT_SECONDS
                                      )
