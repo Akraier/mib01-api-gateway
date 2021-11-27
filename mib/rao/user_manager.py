@@ -69,7 +69,7 @@ class UserManager:
                                          'firstname': firstname,
                                          'lastname': lastname,
                                          'birthdate': str(birthdate),
-                                         #'phone': phone
+                                         'phone': phone
                                      },
                                      timeout=cls.REQUESTS_TIMEOUT_SECONDS
                                      )

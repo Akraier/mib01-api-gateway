@@ -29,6 +29,7 @@ def create_user():
         firstname = form.data['firstname'] 
         lastname = form.data['lastname'] 
         birthdate = form.data['birthdate']
+        phone = form.data['phone']
 
         date = parse(birthdate)
         date = date.strftime('%d/%m/%Y')
@@ -39,7 +40,7 @@ def create_user():
             firstname, 
             lastname, 
             date, 
-            "phone"
+            phone
         ) 
  
         if response.status_code == 201: 
@@ -47,7 +48,7 @@ def create_user():
             user = response.json() 
             to_login = User.build_from_json(user["user"]) 
             login_user(to_login) 
-            return redirect(url_for('index.html', id=to_login.id)) 
+            return redirect('/') 
         elif response.status_code == 200: 
             # user already exists 
             flash('User already exists!') 
