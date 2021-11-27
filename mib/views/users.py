@@ -1,22 +1,66 @@
-from flask import Blueprint, redirect, render_template, url_for, flash, request
+from flask import Blueprint, redirect, render_template, url_for, flash, request, abort
 from flask_login import (login_user, login_required, current_user)
 
 from mib.forms import UserForm, UserModifyForm
 from mib.auth.user import User
-from flask import Blueprint, redirect, render_template, request, abort
-from flask_login import login_required
-import bcrypt
-from mib.auth.auth import current_user
 from mib.rao.user_manager import UserManager
-from json import dumps
-from mib.forms import UserForm
-from datetime import datetime
 
+import bcrypt
+from datetime import datetime
+from dateutil.parser import parse
 import hashlib
 import json
+from json import dumps
 
 users = Blueprint('users', __name__)
 
+@users.route('/create_user', methods=['GET', 'POST'])
+def create_user():
+    """This method allows the creation of a new user into the database 
+ 
+    Returns: 
+        Redirects the user into his profile page, once he's logged in 
+    """ 
+    form = UserForm() 
+ 
+    if form.is_submitted(): 
+        email = form.data['email'] 
+        password = form.data['password'] 
+        firstname = form.data['firstname'] 
+        lastname = form.data['lastname'] 
+        birthdate = form.data['birthdate']
+
+        date = parse(birthdate)
+        date = date.strftime('%d/%m/%Y')
+        
+        response = UserManager.create_user( 
+            email, 
+            password, 
+            firstname, 
+            lastname, 
+            date, 
+            "phone"
+        ) 
+ 
+        if response.status_code == 201: 
+            # in this case the request is ok! 
+            user = response.json() 
+            to_login = User.build_from_json(user["user"]) 
+            login_user(to_login) 
+            return redirect(url_for('index.html', id=to_login.id)) 
+        elif response.status_code == 200: 
+            # user already exists 
+            flash('User already exists!') 
+            return render_template('create_user.html', form=form) 
+        else: 
+            flash('Unexpected response from users microservice!') 
+            return render_template('create_user.html', form=form) 
+    else: 
+        for fieldName, errorMessages in form.errors.items(): 
+            for errorMessage in errorMessages: 
+                flash('The field %s is incorrect: %s' % (fieldName, errorMessage)) 
+ 
+    return render_template('create_user.html', form=form)
 
 
 #LOGIC SHOULD BE DONE - TO TEST
@@ -220,54 +264,6 @@ def get_blacklist():
 #    else:
 #        return redirect("/")
 
-@users.route('/create_user', methods=['GET', 'POST'])
-def create_user():
-    """This method allows the creation of a new user into the database 
- 
-    Returns: 
-        Redirects the user into his profile page, once he's logged in 
-    """ 
-    form = UserForm() 
- 
-    if form.is_submitted(): 
-        email = form.data['email'] 
-        password = form.data['password'] 
-        firstname = form.data['firstname'] 
-        lastname = form.data['lastname'] 
-        birthdate = form.data['date_of_birth']
-        
-        #date = birthdate.strftime('%Y-%m-%d') 
-        date = datetime.strptime(birthdate,'%d/%m/%Y')
-        #phone = form.data['phone'] 
-        response = UserManager.create_user( 
-            email, 
-            password, 
-            firstname, 
-            lastname, 
-            date, 
-            "phone"
-        ) 
- 
-        if response.status_code == 201: 
-            # in this case the request is ok! 
-            user = response.json() 
-            to_login = User.build_from_json(user["user"]) 
-            login_user(to_login) 
-            return redirect(url_for('index.html', id=to_login.id)) 
-        elif response.status_code == 200: 
-            # user already exists 
-            flash('User already exists!') 
-            return render_template('create_user.html', form=form) 
-        else: 
-            flash('Unexpected response from users microservice!') 
-            return render_template('create_user.html', form=form) 
-    else: 
-        for fieldName, errorMessages in form.errors.items(): 
-            for errorMessage in errorMessages: 
-                flash('The field %s is incorrect: %s' % (fieldName, errorMessage)) 
- 
-    return render_template('create_user.html', form=form)
-
 '''
     form = UserForm()
 
@@ -362,3 +358,22 @@ def create_user():
 #                return render_template('report_user.html', action = "Invalid message to report!", code = 404)
 #    else:
 #        return redirect("/")
+
+@users.route('/delete_user/<int:id>', methods=['GET', 'POST'])
+@login_required
+def delete_user(id):
+    """Deletes the data of the user from the database.
+
+    Args:
+        id_ (int): takes the unique id as a parameter
+
+    Returns:
+        Redirects the view to the home page
+    """
+
+    response = UserManager.delete_user(id)
+    if response.status_code != 202:
+        flash("Error while deleting the user")
+        return redirect(url_for('auth.profile', id=id))
+        
+    return redirect(url_for('home.index'))
