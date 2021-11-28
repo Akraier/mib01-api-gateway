@@ -64,13 +64,12 @@ def create_user():
     return render_template('create_user.html', form=form)
 
 
-#LOGIC SHOULD BE DONE - TO TEST
 @users.route('/users')
-#@login_required
+@login_required
 def _users():
     #Filtering only registered users
     _users = UserManager.get_all_users()
-    return render_template("users.html", users=_users,logged = False)
+    return render_template("users.html", users=list(_users))
 
 
 #LOGIC SHOULD BE DONE - TO TEST
