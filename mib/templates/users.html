@@ -16,7 +16,7 @@
             e-mail: {{user.email}} <br>
           </p>
         </div>
-        {%if logged == True%}
+        {%if current_user.id != user.id%}
             <div class="tile-action">
               <button class="btn btn-error btn-sm" id = "{{user.id}}" onclick = "addToBlacklist(id)">
                 <label>Add to Blacklist</label>

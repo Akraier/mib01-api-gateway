@@ -171,12 +171,12 @@ class UserManager:
         :return: User obj with id=user_id
         """
         try:
-            response = requests.get("%s/user" % (cls.USERS_ENDPOINT), timeout=cls.REQUESTS_TIMEOUT_SECONDS)
+            response = requests.get("%s/users" % (cls.USERS_ENDPOINT), timeout=cls.REQUESTS_TIMEOUT_SECONDS)
             json_payload = response.json()
             if response.status_code == 200:
                 #we have to build a list of User obj
                 print(json_payload)
-                list_user = json_payload
+                list_user = json_payload['users_list']
             else:
                 raise RuntimeError('Server has sent an unrecognized status code %s' % response.status_code)
         except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
