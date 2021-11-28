@@ -1,0 +1,68 @@
+{% extends "base.html"%}
+{%block content %}
+    <h1>Message send</h1>
+    <div class="card">
+      <div class="card-header">
+        <a href="/messages/send" class="btn btn-link"><button class="btn btn-link"><i class="icon icon icon-arrow-left"></i></button></a>
+        <div style="float: right;">
+          <button class="btn btn-error tooltip" data-tooltip="Delete message" onclick="openmodal()"><i class="icon icon icon-delete"></i></button> </div>
+          <div class="content" style="margin-top: 3%;margin-left: 3%;">
+            <h2> Recipients </h2> 
+            {% for receiver in receivers %} 
+              <h4 style="margin-left: 2%;"> {{receiver.firstname}} {{ receiver.lastname}} {{ receiver.email}} </h4> 
+            {% endfor %}
+            <h2> Title </h2> <h4 style="margin-left: 2%;"> {{message.title}} </h4>
+            <h2> Content </h2> <h4 font = {{message.font}} style="margin-left: 2%; font-family:font"> {{message.content}} </h4>
+            <h2> Images </h2> <!--<h4 style="margin-left: 2%;"> {{message.content}} </h4> -->
+            <div class="card-body" style="white-space: pre-line" id="content">
+              <div class="card-image" id="image">
+             
+              </div>
+            </div>
+          </div>
+      </div>
+    <div class="modal " id="delete_modal">
+      <a href="#close" class="modal-overlay" aria-label="Close"></a>
+      <div class="modal-container">
+        <div class="modal-header">
+          <a href="#close" class="btn btn-clear float-right" aria-label="Close" onclick="closemodal()"></a>
+          <div class="modal-title h5">Are you sure to delete this message ?</div>
+        </div>
+        <div class="modal-body">
+          <div class="content">
+            To delete the message it will cost you 10 coins
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button onclick="senddelete()" class="btn btn-error" >Delete</button>
+          <button onclick="closemodal()" class="btn btn-link" >Close</button>
+        
+  
+        </div>
+      </div>
+    </div>
+    {%endblock%}
+    {%block script %}
+    <script>
+      
+       var msg_id = '{{message.id}}'
+       var list = {{pictures|safe }} 
+       list.forEach(function(item){
+        document.querySelector("#image").innerHTML = "<img class=\" img-responsive\"src=\"data:;base64,"+item+"\"/>" + document.querySelector("#image").innerHTML
+        });
+      
+      function openmodal(){
+    document.getElementById("delete_modal").classList.add('active');
+   }
+   function closemodal(){
+    document.getElementById("delete_modal").classList.remove('active');
+   }
+   function senddelete(){
+    var xmlHttp = new XMLHttpRequest();
+    theUrl = '/message_withdrow/'+msg_id;
+    xmlHttp.open( "DELETE", theUrl, false);
+    xmlHttp.send(null);
+    window.location.replace("/messages/send");
+   }
+    </script>
+  {%endblock%}

@@ -14,7 +14,7 @@ class User(UserMixin):
     authenticated = None
     is_anonymous = False
     extra_data = None
-
+    
     @staticmethod
     def build_from_json(json: dict):
         kw = {key: json[key] for key in ['id', 'email', 'is_active', 'authenticated', 'is_anonymous']}

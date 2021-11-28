@@ -7,3 +7,4 @@ pytest-cov==2.10.1
 faker==4.17.1
 blinker==1.4
 mockredispy==2.9.3
+bcrypt==3.2.0

@@ -127,6 +127,8 @@ paths:
       responses:
         200:
           description: Renders the create_user template, filled with the fiels for the user's data
+        302:
+          description: Redirects to the correct profile page, depending on the type of the user
     post:
       summary: Add a new customer
       tags: [ User ]

@@ -1,17 +1,43 @@
-{% extends "base.html" %}
-
-{% block title %} Users {% endblock %}
-
-{% block content %}
+{% extends "base.html"%}
+{%block content %}
     <h1>User List</h1>
-    <ul>
-        {% for user in users%}
-            <li>
-                {{ user.firstname }} {{ user.lastname }}
-            </li>
-        {% endfor %}
-    </ul>
-{% endblock %}
+      {% for user in users: %}  
+      <div class="tile">
+        <div class="tile-icon">
+          <div class="example-tile-icon">
+            <i class="icon icon-people centered"></i>
+          </div>
+        </div>
+        <div class="tile-content">
+          <p class="tile-subtitle">{{user.firstname}} <br>
+          
+            First name: {{user.firstname}} <br>
+            Last name: {{user.lastname}} <br>
+            e-mail: {{user.email}} <br>
+          </p>
+        </div>
+        {%if logged == True%}
+            <div class="tile-action">
+              <button class="btn btn-error btn-sm" id = "{{user.id}}" onclick = "addToBlacklist(id)">
+                <label>Add to Blacklist</label>
+                <i class="icon icon-stop left"></i>
+              </button>
+            </div>
+            {%endif%}
+      </div>
+      {% endfor %}
+  </body>
+</html>
+{%endblock%}
+{%block script%}
+<script>
 
-{% block footer %}
-{% endblock %}
+function addToBlacklist(id){
+    var xmlHttp = new XMLHttpRequest();
+    theUrl = `/blacklist/${id}`;
+    xmlHttp.open( "POST", theUrl, false);
+    xmlHttp.send(null);
+    window.location.replace('/blacklist');
+  };
+</script>
+{%endblock%}
