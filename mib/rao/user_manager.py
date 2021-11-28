@@ -61,7 +61,7 @@ class UserManager:
                     firstname: str, lastname: str,
                     birthdate, phone: str):
         try:
-            url = "%s/user" % cls.USERS_ENDPOINT
+            url = "%s/create_user" % cls.USERS_ENDPOINT
             response = requests.post(url,
                                      json={
                                          'email': email,

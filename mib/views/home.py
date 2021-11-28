@@ -14,7 +14,7 @@ _new_msg=0
 #home page
 @home.route('/')
 def index():
-    if current_user is not None and hasattr(current_user, 'id'):
+    if current_user is not None:
         welcome = "Logged In!"
     else:
         welcome = None
