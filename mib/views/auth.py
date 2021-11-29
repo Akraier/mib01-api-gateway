@@ -30,7 +30,7 @@ def login():
         if user is not None: #check that user exists
             if user.ban_expired_date is None: #check ban on user
                 login_user(user)
-                return redirect(url_for('index.html'))
+                return redirect('/')
             elif user.ban_expired_date < datetime.today(): #the ban date has expired, need to set the ban_expired_date to None
                 """"
                 TODO 
@@ -40,16 +40,13 @@ def login():
                 """
                 
                 login_user(user)
-                return redirect(url_for('index.html'))
+                return redirect('/')
             else: #The account is under ban, so the user can't login
                 error="Account under ban"
                 code = 401
                 return render_template('login.html', form=form, error = error), code   #added error to detect bad login
         error="Login failed"
         code = 401
-    else:
-        error = "Invalid login form"
-        code = 400
     return render_template('login.html', form=form, error = error), code   #added error to detect bad login
 
 #route to logout a user
