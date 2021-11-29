@@ -113,6 +113,19 @@ paths:
       responses:
         302:
           description: Redirects to the homepage
+  /myaccount:
+    get:
+      tags: [ UserProfile ]
+      summary: Renders the page with user data
+      responses:
+        200:
+          description: Redirect to the user profile
+    delete:
+      tags: [ UserProfile ]
+      summary: Unregister user setting is_active to False
+      responses:
+        200:
+          description: Redirect to the home page 
   /user/:
     get:
       tags: [ User ]

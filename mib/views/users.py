@@ -98,30 +98,16 @@ def _users_start(s):
 
 #LOGIC SHOULD BE DONE - TO TEST
 @users.route('/myaccount', methods=['DELETE', 'GET'])
+@login_required
 def myaccount():
     if request.method == 'DELETE':
-        #delete the account just deactivating the is_active field into the database
-        if current_user is not None and hasattr(current_user, 'id'):
-            #delete only if the user exist
-            #_user = db.session.query(User).filter(User.id == current_user.id).first()
-            #_user.is_active=False
-            #db.session.commit()
-            UserManager.delete_user(current_user.id) # retrieve the current user
-            return redirect("/logout",code=303)
+        UserManager.delete_user(current_user.id) # retrieve the current user
+        return redirect("/logout",code=303)
     elif request.method == 'GET':
         #get my account info
-        if current_user is not None and hasattr(current_user, 'id'):
-            usr = UserManager.get_user_by_id(current_user.id)#db.session.query(User.filter_isactive).filter(User.id==current_user.id).first()
-            # TO ADD : content = usr.filter_isactive 
-            s = ""
-            #get the status of the content filter button to show it into the web page
-            #if content[0]==True:
-            #    s = "Active"
-            #else:
-            #    s ="Not Active"
-        
-            return render_template("myaccount.html", contentactive=s,new_msg=10)
-        return redirect("/")
+        usr = UserManager.get_user_by_id(current_user.id)#db.session.query(User.filter_isactive).filter(User.id==current_user.id).first()
+        # TO ADD : content = usr.filter_isactive 
+        return render_template("myaccount.html", contentactive=usr['filter_isactive'])
 
 
 @users.route('/myaccount/modify',methods=['GET','POST'])
