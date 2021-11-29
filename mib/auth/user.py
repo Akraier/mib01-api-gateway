@@ -17,6 +17,8 @@ class User(UserMixin):
     
     @staticmethod
     def build_from_json(json: dict):
+        print("JSONNNNNNNN -->")
+        print(json)
         kw = {key: json[key] for key in ['id', 'email', 'is_active', 'authenticated', 'is_anonymous']}
         extra = json.copy()
         all(map(extra.pop, kw))

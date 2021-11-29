@@ -12,6 +12,8 @@ import hashlib
 import json
 from json import dumps
 
+from datetime import datetime
+
 users = Blueprint('users', __name__)
 
 @users.route('/create_user', methods=['GET', 'POST'])
@@ -105,9 +107,14 @@ def myaccount():
         return redirect("/logout",code=303)
     elif request.method == 'GET':
         #get my account info
-        usr = UserManager.get_user_by_id(current_user.id)#db.session.query(User.filter_isactive).filter(User.id==current_user.id).first()
-        # TO ADD : content = usr.filter_isactive 
-        return render_template("myaccount.html", contentactive=usr['filter_isactive'])
+        usr = UserManager.get_user_by_id(current_user.id)
+        print(usr)
+        
+        usr_birth = parse(usr.extra_data['date_of_birth'])
+        usr_birth = usr_birth.strftime('%d/%m/%Y')
+        
+        usr_content_filter = usr.extra_data['filter_isactive']
+        return render_template("myaccount.html", my_current_user = usr, my_birth = usr_birth, my_content_filter = usr_content_filter)
 
 
 @users.route('/myaccount/modify',methods=['GET','POST'])

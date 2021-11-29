@@ -5,34 +5,34 @@
   <div class="panel">
     <div class="panel-header text-center">
       <figure ><i class="icon icon-people"></i></figure>
-      <div class="panel-title h5 mt-10">{{ current_user.firstname }}</div>
-      <div class="panel-subtitle">{{ current_user.lastname }}</div>
+      <div class="panel-title h5 mt-10">{{ my_current_user.firstname }}</div>
+      <div class="panel-subtitle">{{ my_current_user.lastname }}</div>
     </div>
     <div class="divider text-center" data-content="Informations"></div>
     <div class="panel-body">
       <div class="tile tile-centered">
         <div class="tile-content">
           <div class="tile-title text-bold">E-mail</div>
-          <div class="tile-subtitle">{{ current_user.email }}</div>
+          <div class="tile-subtitle">{{ my_current_user.email }}</div>
         </div>
         
       </div>
       <div class="tile tile-centered">
         <div class="tile-content">
           <div class="tile-title text-bold">Firstname</div>
-          <div class="tile-subtitle">{{ current_user.firstname }}</div>
+          <div class="tile-subtitle">{{ my_current_user.firstname }}</div>
         </div>
       </div>
       <div class="tile tile-centered">
         <div class="tile-content">
           <div class="tile-title text-bold">Lastname</div>
-          <div class="tile-subtitle">{{ current_user.lastname }}</div>
+          <div class="tile-subtitle">{{ my_current_user.lastname }}</div>
         </div>
       </div>
       <div class="tile tile-centered">
         <div class="tile-content">
           <div class="tile-title text-bold">Date of birth</div>
-          <div class="tile-subtitle">{{ current_user.date_of_birth.strftime('%d/%m/%Y') }}</div>
+          <div class="tile-subtitle">{{ my_birth }}</div>
         </div>
 
       </div>
@@ -45,7 +45,7 @@
       
       <br>
       Content Filter
-      <button id="content"  backgroundColor="#a9a9a9" value = "content" onclick="pressContentFilter('content')">{{contentactive}}</button>
+      <button id="content"  backgroundColor="#a9a9a9" value = "content" onclick="pressContentFilter('content')">{{my_content_filter}}</button>
       <div class="chip bg-dark float-right">
         <i class="icon icon-stop"></i>
         <a href="/blacklist" class="text-light"> Blacklist Settings</a>
