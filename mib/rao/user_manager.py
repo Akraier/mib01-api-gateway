@@ -128,6 +128,7 @@ class UserManager:
 
         return response
 
+
     @classmethod
     def authenticate_user(cls, email: str, password: str) -> User:
         """
@@ -183,3 +184,21 @@ class UserManager:
             return abort(500)
 
         return list_user
+
+    @classmethod
+    def set_content_filter(cls, user_id: int, filter_v: bool):
+        """
+        This method contacts the users microservice
+        to set the content filter of the user
+        :param user_id: the user id
+        :param filter_v: the value of the content filter
+        :return: User updated
+        """
+        try:
+            url = "%s/user/%s" % (cls.USERS_ENDPOINT, str(user_id), str(filter_v))
+            response = requests.put(url, timeout=cls.REQUESTS_TIMEOUT_SECONDS)
+
+        except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
+            return abort(500)
+
+        return response

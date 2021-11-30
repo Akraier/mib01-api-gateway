@@ -156,34 +156,32 @@ def modify_data():
 
 
 @users.route('/myaccount/set_content', methods=['POST'])
+@login_required
 def set_content():
     #set content filter when button clicked into the GUI
-    if current_user is not None and hasattr(current_user, 'id'):
-            get_data = json.loads(request.data)
-            if(get_data['content']=="Active"):
-                #Setting to True the field in DB
-                UserManager.set_content_filter(current_user.id,True) # TO IMPLEMENT IN OTHER FILES
-                '''stmt = (
-                    update(User).
-                    where(User.id==current_user.id).
-                    values(filter_isactive=True)
-                    )
-                db.session.execute(stmt)
-                db.session.commit()'''
-            else:
-                #Setting to False the field in DB
-                UserManager.set_content_filter(current_user.id,False) # TO IMPLEMENT IN OTHER FILES
-                '''stmt = (
-                    update(User).
-                    where(User.id==current_user.id).
-                    values(filter_isactive=False)
-                )
-                db.session.execute(stmt)
-                db.session.commit()'''
-        
-            return '{"message":"OK"}'
+    get_data = json.loads(request.data)
+    if(get_data['content']=="Active"):
+        #Setting to True the field in DB
+        UserManager.set_content_filter(current_user.id,True) # TO IMPLEMENT IN OTHER FILES
+        '''stmt = (
+            update(User).
+            where(User.id==current_user.id).
+            values(filter_isactive=True)
+            )
+        db.session.execute(stmt)
+        db.session.commit()'''
     else:
-        return redirect("/")
+        #Setting to False the field in DB
+        UserManager.set_content_filter(current_user.id,False) # TO IMPLEMENT IN OTHER FILES
+        '''stmt = (
+            update(User).
+            where(User.id==current_user.id).
+            values(filter_isactive=False)
+        )
+        db.session.execute(stmt)
+        db.session.commit()'''
+
+    return '{"message":"OK"}'
 
 
 @users.route('/blacklist',methods=['GET','DELETE'])

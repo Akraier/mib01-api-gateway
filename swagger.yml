@@ -126,6 +126,16 @@ paths:
       responses:
         200:
           description: Redirect to the home page 
+  
+  #TODO: myaccount/set_content
+  /myaccount/set_content:
+    put:
+      tags: [UserProfile]
+      summary: Update the value for the content filter
+      parameters:
+      - user_id: id
+
+  
   /user/:
     get:
       tags: [ User ]
