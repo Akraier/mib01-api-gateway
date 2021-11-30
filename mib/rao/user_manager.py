@@ -80,18 +80,10 @@ class UserManager:
         return response
 
     @classmethod
-    def update_user(cls, user_id: int, email: str, password: str, phone: str):
+    def update_user(cls, user_id: int, email: str, password: str, firstname: str, lastname: str, birthdate: str):
         """
         This method contacts the users microservice
         to allow the users to update their profiles
-        :param phone:
-        :param password:
-        :param email:
-        :param user_id: the customer id
-            email: the user email
-            password: the user password
-            phone: the user phone
-        :return: User updated
         """
         try:
             url = "%s/user/%s" % (cls.USERS_ENDPOINT, str(user_id))
@@ -99,7 +91,9 @@ class UserManager:
                                     json={
                                         'email': email,
                                         'password': password,
-                                        'phone': phone
+                                        'firstname': firstname,
+                                        'lastname': lastname,
+                                        'birthdate': birthdate,
                                     },
                                     timeout=cls.REQUESTS_TIMEOUT_SECONDS
                                     )
@@ -194,10 +188,12 @@ class UserManager:
         :param filter_v: the value of the content filter
         :return: User updated
         """
-        payload = dict(filter = filter_v)
+        payload = dict(filter = filter_v, id = user_id)
+        print("this is the payload: ", payload)
         try:
-            url = "%s/myaccount/set_content/%s" % (cls.USERS_ENDPOINT, str(user_id))
+            url = "%s/myaccount/set_content" % (cls.USERS_ENDPOINT)
             response = requests.put(url, json = payload, timeout=cls.REQUESTS_TIMEOUT_SECONDS)
+            print("this is the response: ", response)
 
         except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
             return abort(500)

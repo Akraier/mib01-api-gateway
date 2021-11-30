@@ -108,51 +108,59 @@ def myaccount():
     elif request.method == 'GET':
         #get my account info
         usr = UserManager.get_user_by_id(current_user.id)
-        print(usr)
-        
         usr_birth = parse(usr.extra_data['date_of_birth'])
         usr_birth = usr_birth.strftime('%d/%m/%Y')
-        
         usr_content_filter = usr.extra_data['filter_isactive']
         return render_template("myaccount.html", my_current_user = usr, my_birth = usr_birth, my_content_filter = usr_content_filter)
 
 
 @users.route('/myaccount/modify',methods=['GET','POST'])
+@login_required
 def modify_data():
     #modify user data
     form = UserModifyForm()
     if request.method == 'GET':
-        if current_user is not None and hasattr(current_user, 'id'):
-            #render the form with current values of my account
-            form.email.data = current_user.email
-            form.firstname.data = current_user.firstname
-            form.lastname.data = current_user.lastname
-            form.date_of_birth.data = current_user.date_of_birth
-            return render_template('modifymyaccount.html', form = form)
+        #render the form with current values of my account
+        user = UserManager.get_user_by_id(current_user.id)
+        
+        usr_birth = parse(user.extra_data['date_of_birth'])
+        form.date_of_birth.data = usr_birth#.strftime('%d/%m/%Y')
+    
+        form.email.data = user.email
+        form.firstname.data = user.firstname
+        form.lastname.data = user.lastname
+        return render_template('modifymyaccount.html', form = form)
+    
     if request.method == 'POST':
         if form.validate_on_submit():
             #get the user row
-            usr = UserManager.get_usr_by_id(current_user.id) #db.session.query(User).filter(User.id == current_user.id).first()
+            usr = UserManager.get_user_by_id(current_user.id)
             #check current password
-            verified = bcrypt.checkpw(form.password.data.encode('utf-8'), usr.password)
-            if verified:    #to change data values current user need to insert the password
+            usr_authenticated = UserManager.authenticate_user(form.email.data, form.password.data)
+            #verified = bcrypt.checkpw(form.password.data.encode('utf-8'), usr.password)
+            print("AUTENTICATEEEEEEEEEE")
+            print(usr_authenticated)
+            if usr_authenticated.authenticated == True:    #to change data values current user need to insert the password
                 #check for new password inserted in the apposit field
                 if (form.newpassword.data ) and (form.newpassword.data == form.repeatnewpassword.data):
-                    usr.set_password(form.newpassword.data)
-                
+                    new_psw = form.newpassword.data
+                else:
+                    return render_template('modifymyaccount.html', form = form, error = "Wrong new password")    
                 #check that users changed this account email with another already used by another
-                email_check = UserManager.get_usr_by_email(form.email.data).first()#db.session.query(User.email).filter(User.email == form.email.data).filter(User.email != current_user.email).first()
-                if email_check is None:
-                    usr.email = form.email.data
+                email_check = UserManager.get_user_by_email(form.email.data)
+                if email_check is None or email_check.id == current_user.id:
+                    new_email = form.email.data
                 else:
                     return render_template('modifymyaccount.html', form = form, error = "This email is already used! Try with another one.")
-                usr.firstname = form.firstname.data
-                usr.lastname = form.lastname.data
-                usr.date_of_birth = form.date_of_birth.data
-                #db.session.commit()
-                return redirect("/myaccount")
+                
+                resp = UserManager.update_user(current_user.id, form.email.data, new_psw, form.firstname.data, form.lastname.data, str(form.date_of_birth.data))
+                
+                if resp['status'] != 'success':
+                    return render_template('modifymyaccount.html', form = form, error = 'Some error occurred')
+                else:
+                    return render_template('modifymyaccount.html', form = form, success = 'Your data has been updated!')
             else:
-                return render_template('modifymyaccount.html', form = form, error = "Insert your password to apply changes")
+                return render_template('modifymyaccount.html', form = form, error = "Wrong password")
 
 
 @users.route('/myaccount/set_content', methods=['PUT'])
@@ -160,29 +168,12 @@ def modify_data():
 def set_content():
     #set content filter when button clicked into the GUI
     get_data = json.loads(request.data)
-    if(get_data['content']=="Active"):
+    if(get_data['filter']==True):
         #Setting to True the field in DB
-        ret = UserManager.set_content_filter(current_user.id,True) # TO IMPLEMENT IN OTHER FILES
-        print(ret)
-        '''stmt = (
-            update(User).
-            where(User.id==current_user.id).
-            values(filter_isactive=True)
-            )
-        db.session.execute(stmt)
-        db.session.commit()'''
+        ret = UserManager.set_content_filter(current_user.id,True)
     else:
         #Setting to False the field in DB
-        ret = UserManager.set_content_filter(current_user.id,False) # TO IMPLEMENT IN OTHER FILES
-        print(ret)
-        '''stmt = (
-            update(User).
-            where(User.id==current_user.id).
-            values(filter_isactive=False)
-        )
-        db.session.execute(stmt)
-        db.session.commit()'''
-
+        ret = UserManager.set_content_filter(current_user.id,False) 
     return '{"message":"OK"}'
 
 

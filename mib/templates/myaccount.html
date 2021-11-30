@@ -101,11 +101,11 @@
     var property = document.getElementById(btn);
     if (count == 0){
         property.style.backgroundColor = "#a9a9a9"
-        property.textContent = "Not Active"
+        property.textContent = "FALSE"
         count=1;
         
         payload = {
-          content :"Not Active"
+          filter : false
         }
 
         fetch("/myaccount/set_content",
@@ -126,11 +126,11 @@
     }
     else{
         property.style.backgroundColor = "#00bfff"
-        property.textContent = "Active"
+        property.textContent = "TRUE"
         count=0;
 
         payload = {
-          content :"Active"
+          filter : true
         }
 
         fetch("/myaccount/set_content",
