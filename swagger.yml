@@ -127,7 +127,6 @@ paths:
         200:
           description: Redirect to the home page 
   
-  #TODO: myaccount/set_content
   /myaccount/set_content:
     put:
       tags: [UserProfile]

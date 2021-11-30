@@ -80,7 +80,7 @@ class UserManager:
         return response
 
     @classmethod
-    def update_user(cls, user_id: int, email: str, password: str, firstname: str, lastname: str, birthdate: str):
+    def update_user(cls, user_id: int, email: str, password: str, firstname: str, lastname: str, birthdate: str, newpassword: str):
         """
         This method contacts the users microservice
         to allow the users to update their profiles
@@ -94,9 +94,11 @@ class UserManager:
                                         'firstname': firstname,
                                         'lastname': lastname,
                                         'birthdate': birthdate,
+                                        'newpassword': newpassword
                                     },
                                     timeout=cls.REQUESTS_TIMEOUT_SECONDS
                                     )
+            print(response)
             return response
 
         except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):

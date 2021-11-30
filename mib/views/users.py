@@ -142,20 +142,24 @@ def modify_data():
             print(usr_authenticated)
             if usr_authenticated.authenticated == True:    #to change data values current user need to insert the password
                 #check for new password inserted in the apposit field
+                new_psw = form.password.data
                 if (form.newpassword.data ) and (form.newpassword.data == form.repeatnewpassword.data):
                     new_psw = form.newpassword.data
-                else:
-                    return render_template('modifymyaccount.html', form = form, error = "Wrong new password")    
+           
                 #check that users changed this account email with another already used by another
                 email_check = UserManager.get_user_by_email(form.email.data)
                 if email_check is None or email_check.id == current_user.id:
                     new_email = form.email.data
                 else:
                     return render_template('modifymyaccount.html', form = form, error = "This email is already used! Try with another one.")
-                
-                resp = UserManager.update_user(current_user.id, form.email.data, new_psw, form.firstname.data, form.lastname.data, str(form.date_of_birth.data))
-                
-                if resp['status'] != 'success':
+                    
+                print("DATAAAAAAAAA")
+                print(str(form.date_of_birth.data))
+                resp = UserManager.update_user(current_user.id, form.email.data, form.password.data , form.firstname.data, form.lastname.data, str(form.date_of_birth.data), form.newpassword.data)
+                response = resp.json()
+                print("RESSSSSPPP")
+                print(response)
+                if response['status'] != 'success':
                     return render_template('modifymyaccount.html', form = form, error = 'Some error occurred')
                 else:
                     return render_template('modifymyaccount.html', form = form, success = 'Your data has been updated!')
