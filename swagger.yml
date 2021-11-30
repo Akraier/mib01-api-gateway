@@ -132,8 +132,19 @@ paths:
     put:
       tags: [UserProfile]
       summary: Update the value for the content filter
-      parameters:
-      - user_id: id
+      requestBody:
+        required: True
+        content:
+          application/json:
+            schema: 
+              type: object
+              properties: 
+                filter: 
+                  type: bool
+                  description: content filter that allow to show or not bad words
+              required: 
+                - filter
+
 
   
   /user/:

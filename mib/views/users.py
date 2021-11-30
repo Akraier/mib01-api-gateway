@@ -155,14 +155,15 @@ def modify_data():
                 return render_template('modifymyaccount.html', form = form, error = "Insert your password to apply changes")
 
 
-@users.route('/myaccount/set_content', methods=['POST'])
+@users.route('/myaccount/set_content', methods=['PUT'])
 @login_required
 def set_content():
     #set content filter when button clicked into the GUI
     get_data = json.loads(request.data)
     if(get_data['content']=="Active"):
         #Setting to True the field in DB
-        UserManager.set_content_filter(current_user.id,True) # TO IMPLEMENT IN OTHER FILES
+        ret = UserManager.set_content_filter(current_user.id,True) # TO IMPLEMENT IN OTHER FILES
+        print(ret)
         '''stmt = (
             update(User).
             where(User.id==current_user.id).
@@ -172,7 +173,8 @@ def set_content():
         db.session.commit()'''
     else:
         #Setting to False the field in DB
-        UserManager.set_content_filter(current_user.id,False) # TO IMPLEMENT IN OTHER FILES
+        ret = UserManager.set_content_filter(current_user.id,False) # TO IMPLEMENT IN OTHER FILES
+        print(ret)
         '''stmt = (
             update(User).
             where(User.id==current_user.id).

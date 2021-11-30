@@ -194,9 +194,10 @@ class UserManager:
         :param filter_v: the value of the content filter
         :return: User updated
         """
+        payload = dict(filter = filter_v)
         try:
-            url = "%s/user/%s" % (cls.USERS_ENDPOINT, str(user_id), str(filter_v))
-            response = requests.put(url, timeout=cls.REQUESTS_TIMEOUT_SECONDS)
+            url = "%s/myaccount/set_content/%s" % (cls.USERS_ENDPOINT, str(user_id))
+            response = requests.put(url, json = payload, timeout=cls.REQUESTS_TIMEOUT_SECONDS)
 
         except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
             return abort(500)

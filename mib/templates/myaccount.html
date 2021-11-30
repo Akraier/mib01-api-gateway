@@ -110,7 +110,7 @@
 
         fetch("/myaccount/set_content",
           {
-            method: "POST",
+            method: "PUT",
             body: JSON.stringify( payload )
             }).then(function(res){ return res.json(); })
               .then(function(data){
@@ -135,7 +135,7 @@
 
         fetch("/myaccount/set_content",
           {
-            method: "POST",
+            method: "PUT",
             body: JSON.stringify( payload )
             }).then(function(res){ return res.json(); })
               .then(function(data){
