@@ -26,11 +26,11 @@ class Config(object):
     USERS_MS_PORT = os.getenv('USERS_MS_PORT', 5001)
     USERS_MS_URL = '%s://%s:%s' % (USERS_MS_PROTO, USERS_MS_HOST, USERS_MS_PORT)
 
-    # restaurants
-    RESTAURANTS_MS_PROTO = os.getenv('RESTAURANTS_MS_PROTO', 'http')
-    RESTAURANTS_MS_HOST = os.getenv('RESTAURANTS_MS_HOST', 'localhost')
-    RESTAURANTS_MS_PORT = os.getenv('RESTAURANTS_MS_PORT', 5002)
-    RESTAURANTS_MS_URL = '%s://%s:%s' % (RESTAURANTS_MS_PROTO, RESTAURANTS_MS_HOST, RESTAURANTS_MS_PORT)
+    # messages
+    MESSAGES_MS_PROTO = os.getenv('MESSAGES_MS_PROTO', 'http')
+    MESSAGES_MS_HOST = os.getenv('MESSAGES_MS_HOST', 'localhost')
+    MESSAGES_MS_PORT = os.getenv('MESSAGES_MS_PORT', 5002)
+    MESSAGES_MS_URL = '%s://%s:%s' % (MESSAGES_MS_PROTO, MESSAGES_MS_HOST, MESSAGES_MS_PORT)
 
     # reservation
     RESERVATIONS_MS_PROTO = os.getenv('RESERVATIONS_MS_PROTO', 'http')
