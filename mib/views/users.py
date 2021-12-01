@@ -153,9 +153,8 @@ def modify_data():
                 else:
                     return render_template('modifymyaccount.html', form = form, error = "This email is already used! Try with another one.")
                     
-                print("DATAAAAAAAAA")
-                print(str(form.date_of_birth.data))
-                resp = UserManager.update_user(current_user.id, form.email.data, form.password.data , form.firstname.data, form.lastname.data, str(form.date_of_birth.data), form.newpassword.data)
+                date_to_change = form.date_of_birth.data.strftime('%m/%d/%Y')
+                resp = UserManager.update_user(current_user.id, form.email.data, form.password.data , form.firstname.data, form.lastname.data, str(date_to_change), form.newpassword.data)
                 response = resp.json()
                 print("RESSSSSPPP")
                 print(response)
