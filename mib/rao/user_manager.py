@@ -180,7 +180,22 @@ class UserManager:
             return abort(500)
 
         return list_user
+    @classmethod
+    def get_user_by_first_letter(cls, first_letter: str ):
+        """This method contact the user microservice asking the user with firstname starting with 'first_letter' """
+        try:
+            response = requests.get("%s/user_firstletter/%s" % (cls.USERS_ENDPOINT, first_letter),
+                                    timeout=cls.REQUESTS_TIMEOUT_SECONDS)
+            json_payload = response.json()
+            user = None
 
+            if response.status_code == 200:
+                user = User.build_from_json(json_payload)
+
+        except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
+            return abort(500)
+
+        return user
     @classmethod
     def set_content_filter(cls, user_id: int, filter_v: bool):
         """

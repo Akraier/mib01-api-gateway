@@ -51,7 +51,22 @@ paths:
       responses:
         200:
           description: Calls the login method
-  
+  /user/start/{firstletter}:
+    get:
+      tags: [ Profile ]
+      summary: Retrieve the user with firstname starting with firstletter
+      parameters:
+      - name: firstletter
+        in: path
+        description: first letter of firstname
+        required: true
+        schema:
+          type: string
+      responses:
+        200:
+          description: Retrieve the user
+        404:
+          description: No user matching the parameter
   /user/{id}:
     get:
       tags: [ Profile ]
