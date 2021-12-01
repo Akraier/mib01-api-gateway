@@ -138,8 +138,6 @@ def modify_data():
             #check current password
             old_mail = usr.email
             usr_authenticated = UserManager.authenticate_user(old_mail, form.password.data) #check the authentication with the old mail and psw
-            print("AUTENTICATEEEEEEEEEE")
-            print(usr_authenticated)
             if usr_authenticated.authenticated == True:    #to change data values current user need to insert the password
                 #check for new password inserted in the apposit field
                 new_psw = form.password.data
@@ -157,8 +155,7 @@ def modify_data():
                 
                 resp = UserManager.update_user(current_user.id, form.email.data, form.password.data , form.firstname.data, form.lastname.data, str(date_to_change), form.newpassword.data)
                 response = resp.json()
-                print("RESSSSSPPP")
-                print(response)
+                
                 if response['status'] != 'success':
                     return render_template('modifymyaccount.html', form = form, error = 'Some error occurred')
                 else:
