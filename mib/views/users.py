@@ -136,8 +136,8 @@ def modify_data():
             #get the user row
             usr = UserManager.get_user_by_id(current_user.id)
             #check current password
-            usr_authenticated = UserManager.authenticate_user(form.email.data, form.password.data)
-            #verified = bcrypt.checkpw(form.password.data.encode('utf-8'), usr.password)
+            old_mail = usr.email
+            usr_authenticated = UserManager.authenticate_user(old_mail, form.password.data) #check the authentication with the old mail and psw
             print("AUTENTICATEEEEEEEEEE")
             print(usr_authenticated)
             if usr_authenticated.authenticated == True:    #to change data values current user need to insert the password
@@ -153,7 +153,8 @@ def modify_data():
                 else:
                     return render_template('modifymyaccount.html', form = form, error = "This email is already used! Try with another one.")
                     
-                date_to_change = form.date_of_birth.data.strftime('%m/%d/%Y')
+                date_to_change = form.date_of_birth.data.strftime('%d/%m/%Y')
+                
                 resp = UserManager.update_user(current_user.id, form.email.data, form.password.data , form.firstname.data, form.lastname.data, str(date_to_change), form.newpassword.data)
                 response = resp.json()
                 print("RESSSSSPPP")
