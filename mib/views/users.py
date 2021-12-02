@@ -78,25 +78,15 @@ def _users():
 @users.route('/users/start/<s>')
 def _users_start(s):
     #Select the first user in the db with firstname starting by "s", used in search bar for message sending
-    #users = UserManager.get_all_users() #db.session.query(User).filter(User.is_active==True).filter(User.firstname.startswith(s)).limit(2).all()
-    user = UserManage.get_user_by_first_letter(s)
-    #Filtering the list of users
-    count_limit = 0 # to show only the first N (in this case 2) users
-    for usr in users:
-        if usr.is_active == False:
-            users.remove(usr)
-        if usr.firstname.startswith(s) == False:
-            users.remove(usr)
-        if count_limit == 1:
-            break
-        else:
-            count_limit += 1
-            
-    if (len(users)>0):
-    else:
-        return dumps({})
+    users = UserManager.get_all_users() #db.session.query(User).filter(User.is_active==True).filter(User.firstname.startswith(s)).limit(2).all()
     
-    return dumps({'firstname' : user.firstname,'lastname':user.lastname,'email':user.email})
+    #Filtering the list of users
+    for usr in users:
+        if usr['is_active'] == True:
+            if usr['firstname'].startswith(s) == True:
+                return  dumps({'id':users[0]['id'],'firstname' : users[0]['firstname'], 'lastname':users[0]['lastname'],'email':users[0]['email']})
+    
+    return dumps({})
 
 
 #LOGIC SHOULD BE DONE - TO TEST
