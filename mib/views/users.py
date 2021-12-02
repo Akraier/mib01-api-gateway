@@ -24,7 +24,7 @@ def create_user():
         Redirects the user into his profile page, once he's logged in 
     """ 
     form = UserForm() 
- 
+    
     if form.is_submitted(): 
         email = form.data['email'] 
         password = form.data['password'] 

@@ -184,14 +184,16 @@ def message_new():
 #        return '{"message":"'+r+'"}'
 
 #route to have a draft msg
-@message.route('/message/draft',methods = ['POST'])
+@message.route('/message/draft',methods = ['GET','POST'])
 @login_required
 def message_draft():
     """This method allows the creation of a new draft message
     """ 
-    message = MessageManager.save_draft(request)
- 
-    return {"message": message}
+    if request.method == 'GET':
+        return render_template("message_draft_response.html")
+    else:
+        message = MessageManager.save_draft(request,current_user.id)
+        return message
 
 
 #select message to be read and access the reading panel or delete it from the list
@@ -306,17 +308,14 @@ def message_draft():
 #
 #
 #                                             
-#@message.route('/messages/send',methods=['GET'])
-#def message_send():
-#    if current_user is not None and hasattr(current_user, 'id'):
-#    
-#        _send = db.session.query(Messages.id,Messages.title,Messages.date_of_delivery, Messages.font).filter(Messages.sender==current_user.id,Messages.is_draft==False).all()
-#        _draft = db.session.query(Messages.id,Messages.title,Messages.date_of_delivery, Messages.font).filter(Messages.sender==current_user.id,Messages.is_draft==True).all()
-#
-#        
-#        return render_template('get_msg_send_draft.html',draft=_draft,send=_send)
-#    else:
-#        return redirect('/')
+@message.route('/messages/send',methods=['GET'])
+@login_required
+def messages_send():
+        
+    response = MessageManager.get_all_messages(current_user.id)
+    
+    return render_template('get_msg_send_draft.html',draft=list(response.get("_draft")),send=list(response.get("_sent")))
+
 #
 ## get the list of messages received until now
 #@message.route('/messages', methods=['GET'])
