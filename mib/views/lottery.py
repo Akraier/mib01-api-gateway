@@ -1,6 +1,7 @@
 from flask import Blueprint, render_template, request, abort
+from flask_login import login_required
 from werkzeug.utils import redirect 
-
+from mib.rao.lottery_manager import Lottery
 from datetime import date, datetime, timedelta
 
 import json
@@ -14,16 +15,15 @@ Lottery extract randomly 1 number from 1 to 99, if your guess is lucky you won h
 """
 # This is useful for the user to know what number he choosed or to know if he had not already choose a number
 @lottery.route('/lottery',methods = ['GET'])
+@login_required
 def lucky_number():
-    if current_user is not None and hasattr(current_user, 'id'):
-        guess = db.session.query(User.lottery_ticket_number).filter(User.id == current_user.id).first()
-        if guess.lottery_ticket_number != -1:
-            return render_template('lottery_board.html',action = "You already select the number. This is your number: "+ str(guess.lottery_ticket_number)+"!") 
-        else:
-            return render_template('lottery_board.html',action = "You have selected no number yet, hurry up! Luck is not waiting for you!")
+    #guess = db.session.query(User.lottery_ticket_number).filter(User.id == current_user.id).first()
+    guess = LotteryManager.retrieve_by_id(current_user.id)
+    if guess.lottery_ticket_number != -1:
+        return render_template('lottery_board.html',action = "You already select the number. This is your number: "+ str(guess.lottery_ticket_number)+"!") 
     else:
-        return redirect("/")
-
+        return render_template('lottery_board.html',action = "You have selected no number yet, hurry up! Luck is not waiting for you!")
+    
 
 # This route is necessary to allow user to select a number for the next lottery extraction.
 # There is a time limit to choose the number: user can choose number in the first half of the month (from 1st to 15th)
