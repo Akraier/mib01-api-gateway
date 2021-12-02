@@ -26,17 +26,11 @@ class Config(object):
     USERS_MS_PORT = os.getenv('USERS_MS_PORT', 5001)
     USERS_MS_URL = '%s://%s:%s' % (USERS_MS_PROTO, USERS_MS_HOST, USERS_MS_PORT)
 
-    # restaurants
-    RESTAURANTS_MS_PROTO = os.getenv('RESTAURANTS_MS_PROTO', 'http')
-    RESTAURANTS_MS_HOST = os.getenv('RESTAURANTS_MS_HOST', 'localhost')
-    RESTAURANTS_MS_PORT = os.getenv('RESTAURANTS_MS_PORT', 5002)
-    RESTAURANTS_MS_URL = '%s://%s:%s' % (RESTAURANTS_MS_PROTO, RESTAURANTS_MS_HOST, RESTAURANTS_MS_PORT)
-
-    # reservation
-    RESERVATIONS_MS_PROTO = os.getenv('RESERVATIONS_MS_PROTO', 'http')
-    RESERVATIONS_MS_HOST = os.getenv('RESERVATIONS_MS_HOST', 'localhost')
-    RESERVATIONS_MS_PORT = os.getenv('RESERVATIONS_MS_PORT', 5003)
-    RESERVATIONS_MS_URL = '%s://%s:%s' % (RESERVATIONS_MS_PROTO, RESERVATIONS_MS_HOST, RESERVATIONS_MS_PORT)
+    # lottery
+    LOTTERY_MS_PROTO = os.getenv('LOTTERY_MS_PROTO', 'http')
+    LOTTERY_MS_HOST = os.getenv('LOTTERY_MS_HOST', 'localhost')
+    LOTTERY_MS_PORT = os.getenv('LOTTERY_MS_PORT', 5002)
+    LOTTERY_MS_URL = '%s://%s:%s' % (LOTTERY_MS_PROTO, LOTTERY_MS_HOST, LOTTERY_MS_PORT)
 
     # notifications
     NOTIFICATIONS_MS_PROTO = os.getenv('NOTIFICATIONS_MS_PROTO', 'http')

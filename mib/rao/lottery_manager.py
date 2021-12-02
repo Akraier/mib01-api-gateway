@@ -21,3 +21,4 @@ class LotteryManager:
             return abort(500)
 
         return 'user'
+    

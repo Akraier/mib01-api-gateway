@@ -8,6 +8,7 @@ import requests
 class UserManager:
     USERS_ENDPOINT = app.config['USERS_MS_URL']
     REQUESTS_TIMEOUT_SECONDS = app.config['REQUESTS_TIMEOUT_SECONDS']
+    LOTTERY_ENDPOINT = app.config['LOTTERY_MS_URL']
 
     @classmethod
     def get_user_by_id(cls, user_id: int) -> User:
@@ -61,8 +62,9 @@ class UserManager:
                     firstname: str, lastname: str,
                     birthdate, phone: str):
         try:
-            url = "%s/create_user" % cls.USERS_ENDPOINT
-            response = requests.post(url,
+            # we need to initialize both the lottery and the user db
+            usr_url = "%s/create_user" % cls.USERS_ENDPOINT
+            response_usr = requests.post(usr_url,
                                      json={
                                          'email': email,
                                          'password': password,
@@ -73,11 +75,30 @@ class UserManager:
                                      },
                                      timeout=cls.REQUESTS_TIMEOUT_SECONDS
                                      )
+            print(response_usr.json())
+            id = response_usr.json()['user']['id'] #get the user id just created
+            
+            lottery_url = "%s/lottery/%s" % (cls.LOTTERY_ENDPOINT, str(id))
+            response_lottery = requests.post(lottery_url,
+                                     json = {'id': id},
+                                     timeout=cls.REQUESTS_TIMEOUT_SECONDS
+                                    )
 
         except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
             return abort(500)
-
-        return response
+        
+        null_response = {
+            'user': None,
+            'status': 'error',
+            'message': 'Some error occurred during the registration process',
+        }
+        print("LOTTERY     " + response_lottery)
+        print("USR         " + response_usr)
+        #check for errors
+        if response_lottery.json()['status'] != 'success' or response_usr.json()['status'] != 'success':
+            return null_response
+        else:
+            return response_usr
 
     @classmethod
     def update_user(cls, user_id: int, email: str, password: str, firstname: str, lastname: str, birthdate: str, newpassword: str):
