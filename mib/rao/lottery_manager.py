@@ -11,14 +11,32 @@ class LotteryManager:
     @classmethod
     def retrieve_by_id(cls, id_:int):
         try:
-            response = requests.get("%s/user/%s" % (cls.LOTTERY_ENDPOINT,str(id_)),
+            response = requests.get("%s/lottery/%s" % (cls.LOTTERY_ENDPOINT,str(id_)),
                                     timeout=cls.REQUESTS_TIMEOUT_SECONDS)
             json_payload = response.json()
-            if response.status_code == 200:
-                print("PAYLOAAAAAAD----"+json_payload)
-                return json_payload
+            print("THE RESPONSE OF GET LOTTERY NUMBER:::::::", json_payload)
+            if json_payload['status'] != 'success':
+                return None
         except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
             return abort(500)
 
-        return 'user'
+        return json_payload['lottery_row']
+    
+    
+    @classmethod
+    def update_lottery_number(cls, id_ : int, val_ : int):
+        try:
+            response = requests.post("%s/lottery/select_number/%s" % (cls.LOTTERY_ENDPOINT,str(id_)),
+                                    json = {'number_selected': val_},
+                                    timeout=cls.REQUESTS_TIMEOUT_SECONDS)
+            json_payload = response.json()
+            print("THE RESPONSE OF GET LOTTERY NUMBER:::::::", json_payload)
+            if json_payload['status'] != 'success':
+                return None
+        except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
+            return abort(500)
+
+        response = {'status': 'success'}
+        return jsonify(response)
+    
     

@@ -1,5 +1,5 @@
 from flask import Blueprint, render_template, request, abort
-from flask_login import login_required
+from flask_login import (login_user, login_required, current_user)
 from werkzeug.utils import redirect 
 from mib.rao.lottery_manager import LotteryManager
 from datetime import date, datetime, timedelta
@@ -17,10 +17,12 @@ Lottery extract randomly 1 number from 1 to 99, if your guess is lucky you won h
 @lottery.route('/lottery',methods = ['GET'])
 @login_required
 def lucky_number():
-    #guess = db.session.query(User.lottery_ticket_number).filter(User.id == current_user.id).first()
-    guess = LotteryManager.retrieve_by_id(current_user.id)
-    if guess.lottery_ticket_number != -1:
-        return render_template('lottery_board.html',action = "You already select the number. This is your number: "+ str(guess.lottery_ticket_number)+"!") 
+    lottery_infos = LotteryManager.retrieve_by_id(current_user.id)
+    if lottery_infos is None: #no row for the user (error!)
+        return render_template('lottery_board.html', action = 'Some error occurred')
+    
+    if lottery_infos['ticket_number'] != -1:
+        return render_template('lottery_board.html',action = "You already select the number. This is your number: "+ str(lottery_infos['ticket_number'])+"!") 
     else:
         return render_template('lottery_board.html',action = "You have selected no number yet, hurry up! Luck is not waiting for you!")
     
@@ -38,15 +40,14 @@ def play(number_):
         today = date.today()
         day_of_month = today.day
         if day_of_month <= last_day:
-            usr = db.session.query(User).filter(User.id == current_user.id).first() #retrieve the User element to access after at its fields
+            usr_lottery_row = LotteryManager.retrieve_by_id(current_user.id)
             
-            if usr.lottery_ticket_number == -1: #user doesn't already choose a number, so now he can. We save in the DB the number selected
-                usr.set_lottery_number(number)
-                db.session.commit()
+            if usr_lottery_row['ticket_number'] == -1: #user doesn't already choose a number, so now he can. We save in the DB the number selected
+                LotteryManager.update_lottery_number(current_user.id,number)
                 return render_template('lottery_board.html',action = "You select the number "+str(number)+"! Good Luck!")
             else:
                 #already choosed a number
-                return render_template('lottery_board.html',action = "You already select the number "+ str(usr.lottery_ticket_number)+"! Good Luck!")
+                return render_template('lottery_board.html',action = "You already select the number "+ str(usr_lottery_row['ticket_number'])+"! Good Luck!")
         else:
             #can't choose a number because it's expired the usefuk time (useful time: from 1st to 15th of month)
             return render_template('lottery_board.html', action = "You cannot choose any more a number, the time to partecipate to lottery is expired! Try next month!")
