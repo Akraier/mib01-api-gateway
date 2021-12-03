@@ -201,3 +201,49 @@ class UserManager:
             return abort(500)
 
         return response
+
+    
+     #Method to retrieve the blacklist from the database
+    @classmethod
+    def get_blacklist(cls, user_id: int) -> User:
+        """
+        This method contacts the users microservice
+        and retrieves the blacklist.
+        """
+       
+        try:
+            response = requests.get("%s/user/blacklist/%d" % (cls.USERS_ENDPOINT,user_id), timeout=cls.REQUESTS_TIMEOUT_SECONDS)
+            print(response)
+            json_payload = response.json()
+            if response.status_code == 200:
+                #we have to build a list of User obj
+                print(json_payload)
+                black_user = json_payload['black_list']
+            else:
+                raise RuntimeError('Server has sent an unrecognized status code %s' % response.status_code)
+        except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
+            return abort(500)
+
+        return black_user
+        
+    @classmethod
+    def delete_blacklist(cls, user_id: int) -> User:
+        """
+        This method contacts the users microservice
+        and delete the blacklist
+        """
+       
+        try:
+            response = requests.delete("%s/user/blacklist/%d" % (cls.USERS_ENDPOINT,user_id), timeout=cls.REQUESTS_TIMEOUT_SECONDS)
+            print(response)
+            json_payload = response.json()
+            if response.status_code == 200:
+                #we have to build a list of User obj
+                print(json_payload)
+                black_user = json_payload['content']
+            else:
+                raise RuntimeError('Server has sent an unrecognized status code %s' % response.status_code)
+        except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
+            return abort(500)
+
+        return black_user
