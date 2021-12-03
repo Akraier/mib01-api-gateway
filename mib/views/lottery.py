@@ -32,6 +32,8 @@ def lucky_number():
 @lottery.route('/lottery/<number_>',methods = ['POST'])
 @login_required
 def play(number_):
+    
+    print("HELLOOOOOOOOOOO")
     #guess a number for lottery
     last_day = 15 #last day of the month useful to select a number
     number = int(number_)
@@ -42,12 +44,17 @@ def play(number_):
         if day_of_month <= last_day:
             usr_lottery_row = LotteryManager.retrieve_by_id(current_user.id)
             
+            print("_____--> the rowwwww first::::::", usr_lottery_row)
+            
             if usr_lottery_row['ticket_number'] == -1: #user doesn't already choose a number, so now he can. We save in the DB the number selected
+                print("questa è la ROWWWWW _____ ", usr_lottery_row)
                 LotteryManager.update_lottery_number(current_user.id,number)
-                return render_template('lottery_board.html',action = "You select the number "+str(number)+"! Good Luck!")
+                #return render_template('lottery_board.html',action = "You select the number "+str(number)+"! Good Luck!")
+                return redirect('/lottery')
             else:
                 #already choosed a number
-                return render_template('lottery_board.html',action = "You already select the number "+ str(usr_lottery_row['ticket_number'])+"! Good Luck!")
+                return redirect('/lottery')
+                #return render_template('lottery_board.html',action = "You already select the number "+ str(usr_lottery_row['ticket_number'])+"! Good Luck!")
         else:
             #can't choose a number because it's expired the usefuk time (useful time: from 1st to 15th of month)
             return render_template('lottery_board.html', action = "You cannot choose any more a number, the time to partecipate to lottery is expired! Try next month!")
