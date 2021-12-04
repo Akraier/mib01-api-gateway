@@ -203,8 +203,11 @@ def add_to_black_list(target):
             UserManager.insert_blacklist(current_user.id, ta)
             return render_template('black_list.html',action="User "+target+" added to the black list.",black_list = [])
        elif request.method == 'DELETE':
-           #Delete target from blacklist
-           pass
+            ta = int(target)
+            l = UserManager.delete_blacklist_target(current_user.id, ta)
+            print("----")
+            print(l)
+            return render_template('black_list.html',action="User "+target+" removed from your black list",black_list = [])
 
 
 # '''
