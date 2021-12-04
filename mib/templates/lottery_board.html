@@ -31,17 +31,21 @@
     e.innerHTML = output;
   }
 
+
   function selectNumber(id){
     var e = document.getElementById(id);
     //fetch(`/lottery/${id}`, {method: "POST"}).then(function(res){ return res.json();}).then(function(data){})
-    var xmlHttp = new XMLHttpRequest();
-    theUrl = `/lottery/${id}`;
-    xmlHttp.open( "POST", theUrl, false );
-    xmlHttp.send(null);
+    
+    myUrl = `/lottery/${id}`;
+    var xhr = new XMLHttpRequest();
+    xhr.open("POST", myUrl, true);
+    xhr.setRequestHeader('Content-Type', 'application/json');
+    xhr.send(null);
     window.location.reload();
     if (_action == "You have selected no number yet, hurry up! Luck is not waiting for you!"){
       e.style.backgroundColor = "#cfb2ff";
     }
+    window.location.reload();
   };
 
 </script>

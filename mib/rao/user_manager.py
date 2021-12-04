@@ -76,30 +76,34 @@ class UserManager:
                                      },
                                      timeout=cls.REQUESTS_TIMEOUT_SECONDS
                                      )
+            print("STAMPO LA RISPOSTAAAAAAAAAAAAAA")
             print(response_usr.json())
             id = response_usr.json()['user']['id'] #get the user id just created
             
-            #lottery_url = "%s/lottery/%s" % (cls.LOTTERY_ENDPOINT, str(id))
-            #response_lottery = requests.post(lottery_url,
-            #                         json = {'id': id},
-            #                         timeout=cls.REQUESTS_TIMEOUT_SECONDS
-            #                        )
+            lottery_url = "%s/lottery/%s" % (cls.LOTTERY_ENDPOINT, str(id))
+            response_lottery = requests.post(lottery_url,
+                                     json = {'id': id},
+                                     timeout=cls.REQUESTS_TIMEOUT_SECONDS
+                                    )
 
+            print("STAMPO LA RISPOSTAA di LOTTERYYYYYYYYYYYYY")
+            print(response_lottery.json())
+            
         except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
             return abort(500)
         
-        #null_response = {
-        #    'user': None,
-        #    'status': 'error',
-        #    'message': 'Some error occurred during the registration process',
-        #}
-        #print("LOTTERY     " + response_lottery)
-        #print("USR         " + response_usr)
-        ##check for errors
-        #if response_lottery.json()['status'] != 'success' or response_usr.json()['status'] != 'success':
-        #    return null_response
-        #else:
-        return response_usr
+        null_response = {
+            'user': None,
+            'status': 'error',
+            'message': 'Some error occurred during the registration process',
+        }
+        print("LOTTERY     ",response_lottery)
+        print("USR         ", response_usr)
+        #check for errors
+        if response_lottery.json()['status'] != 'success' or response_usr.json()['status'] != 'success':
+            return null_response
+        else:
+            return response_usr
 
     @classmethod
     def update_user(cls, user_id: int, email: str, password: str, firstname: str, lastname: str, birthdate: str, newpassword: str):
