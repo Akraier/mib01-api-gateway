@@ -68,6 +68,7 @@ function removeBlacklist(){
   function removeFromBlacklist(id){
     var xmlHttp = new XMLHttpRequest();
     theUrl = `/blacklist/${id}`;
+    console.log(theUrl)
     xmlHttp.open( "DELETE", theUrl, false);
     xmlHttp.send(null);
     window.location.reload();

@@ -171,114 +171,72 @@ def set_content():
 
 
 @users.route('/blacklist',methods=['GET','DELETE'])
-#@login_required
+@login_required
 def get_blacklist():
     if request.method == 'GET':
+
         #get blacklist of current user
-        response = UserManager.get_user_by_id(current_user.id)
-        if response.status_code != 200:
-            flash("Error while getting the blacklist")
-            return render_template('black_list.html',action="Error while retrieving blacklist",black_list=[])
-        data = response.json()
-        return render_template('black_list.html',action="This is your blacklist",black_list=data['extra'])
+        data = UserManager.get_blacklist(current_user.id)
+        return render_template('black_list.html',action="This is your blacklist",black_list=data)
+
     elif request.method == 'DELETE':
         #Clear the whole blacklist
-        pass
-        #black_list = db.session.query(blacklist.c.user_id).filter(blacklist.c.user_id==current_user.id).first()
-        #if black_list is not None:
-        #    #clear only if the blacklist is not empty
-        #    st = blacklist.delete().where(blacklist.c.user_id == current_user.id)
-        #    db.session.execute(st)   
-        #    db.session.commit()
-        #    black_list = db.session.query(blacklist).filter(blacklist.c.user_id == current_user.id)
-        #
-        #    return render_template('black_list.html',action="Your blacklist is now empty",black_list=black_list,new_msg=_new_msg)
-        #else:
-        #    return render_template('black_list.html',action="Your blacklist is already empty",black_list=[],new_msg=_new_msg)
+        data = UserManager.delete_blacklist(current_user.id)
+        return render_template('black_list.html',action="Your blacklist is now empty",black_list=data)
+    
         
-#@users.route('/blacklist/<target>', methods=['POST', 'DELETE'])
-#def add_to_black_list(target):
-#    #route that add target to the blacklist of user.
-#    if current_user is not None and hasattr(current_user, 'id'):
-#        #current can not add himself into the blacklist
-#        #check that both users are registered and that 'user' is exactly current user and nobody else
-#        existUser = db.session.query(User).filter(User.id==current_user.id).first()
-#        existTarget = db.session.query(User).filter(User.id==target).first()
-#        #add target into the user's blacklist
-#        if request.method == 'POST':
-#            #be sure that name is not into the blacklist already
-#            if existUser is not None and existTarget is not None and current_user.id != target: 
-#                inside = db.session.query(blacklist).filter(blacklist.c.user_id == current_user.id).filter(blacklist.c.black_id == target).first()
-#                if inside is None: #the user is NOT already in the blacklist
-#                    existUser.black_list.append(existTarget)
-#                    db.session.commit()
-#                    user_bl = db.session.query(User.email,User.firstname,User.lastname,blacklist).filter(blacklist.c.user_id == current_user.id).filter(blacklist.c.black_id == User.id)
-#                    return render_template('black_list.html',action="User "+target+" added to the black list.",black_list = user_bl)
-#                else: #target already in the blacklist
-#                    user_bl = db.session.query(User.email,User.firstname,User.lastname,blacklist).filter(blacklist.c.user_id == current_user.id).filter(blacklist.c.black_id == User.id)
-#                    return render_template('black_list.html',action="This user is already in your blacklist!",black_list = user_bl)
-#            else:
-#                #User or Target not in db
-#                return render_template('black_list.html',action="Please check that you select a correct user",black_list=[])    
-#        elif request.method == 'DELETE':
-#            #Delete target from blacklist
-#            if existUser is not None and existTarget is not None:
-#                #Delete target from current user's blacklist
-#                bl_target = db.session.query(blacklist).filter((blacklist.c.user_id == current_user.id)&(blacklist.c.black_id == target)).first()
-#                if bl_target is not None:
-#                    #check that target is already into the black list 
-#                    st = blacklist.delete().where((blacklist.c.user_id == current_user.id)&(blacklist.c.black_id == target))
-#                    db.session.execute(st)
-#                    db.session.commit()
-#                    bl_ = db.session.query(User.email,User.firstname,User.lastname,blacklist).filter(blacklist.c.user_id == current_user.id).filter(blacklist.c.black_id == User.id)
-#                    return render_template('black_list.html',action = "User "+target+" removed from your black list.",black_list= bl_)
-#                else:
-#                    bl_ = db.session.query(User.email,User.firstname,User.lastname,blacklist).filter(blacklist.c.user_id == current_user.id).filter(blacklist.c.black_id == User.id)
-#                    return render_template('black_list.html', action ="This user is not in your blacklist", black_list= bl_)
-#            else:
-#                #User or Target not in db
-#                return render_template('black_list.html',action="Please check that you select a correct user",black_list=[]) 
-#    else:
-#        return redirect("/")
+@users.route('/blacklist/<target>', methods=['POST', 'DELETE'])
+@login_required
+def add_to_black_list(target):
+   #route that add target to the blacklist of user.
+       #add target into the user's blacklist
+       if request.method == 'POST':
+            ta = int(target)
+            UserManager.insert_blacklist(current_user.id, ta)
+            return render_template('black_list.html',action="User "+target+" added to the black list.",black_list = [])
+       elif request.method == 'DELETE':
+            ta = int(target)
+            l = UserManager.delete_blacklist_target(current_user.id, ta)
+            print("----")
+            print(l)
+            return render_template('black_list.html',action="User "+target+" removed from your black list",black_list = [])
 
-'''
-    form = UserForm()
 
-    if request.method == 'POST':
-        if form.validate_on_submit() == True:
-            new_user = User()
-            form.populate_obj(new_user)
-            if db.session.query(User).filter(User.email == form.email.data).first() is not None:
-                #email already used so we have to ask to fill again the fields
-                return render_template('create_user.html',form=form,error="Email already used!")
-            """
-            Password should be hashed with some salt. For example if you choose a hash function x, 
-            where x is in [md5, sha1, bcrypt], the hashed_password should be = x(password + s) where
-            s is a secret key.
-            """
-            
-            #Check the correct fromat for date of birth
-            date_string = form.date_of_birth.data
-            format = '%d/%m/%Y'
-            try:
-                dt_.strptime(date_string, format)
-            except ValueError: #the format of date inserted is not correct
-                return render_template('create_user.html',form=form,error="Please enter a valid date of birth in the format dd/mm/yyyy!")
-            #Check the validity of date of birth (no dates less than 1900, no dates higher than last year
-            datetime_object = dt_.strptime(form.date_of_birth.data, '%d/%m/%Y')
-            my_1_year_ago = dt_.now() - timedelta(days=365)
-            if datetime_object > my_1_year_ago or datetime_object < dt_(1900,1,1):
-                return render_template('create_user.html',form=form,error="Please enter a valid date of birth!")
-            
-            # Setting the user fields and add user to DB
-            new_user.set_password(form.password.data)
-            new_user.set_dateOfBirth(datetime_object) #setting the date correctly
-            db.session.add(new_user)
-            db.session.commit()
-            return redirect('/')
-    elif request.method == 'GET':
-        return render_template('create_user.html', form=form)
-'''
+# '''
+#     form = UserForm()
+#     if request.method == 'POST':
+#         if form.validate_on_submit() == True:
+#             new_user = User()
+#             form.populate_obj(new_user)
+#             if db.session.query(User).filter(User.email == form.email.data).first() is not None:
+#                 #email already used so we have to ask to fill again the fields
+#                 return render_template('create_user.html',form=form,error="Email already used!")
+#             """
+#             Password should be hashed with some salt. For example if you choose a hash function x, 
+#             where x is in [md5, sha1, bcrypt], the hashed_password should be = x(password + s) where
+#             s is a secret key.
+#             """           
+#             #Check the correct fromat for date of birth
+#             date_string = form.date_of_birth.data
+#             format = '%d/%m/%Y'
+#             try:
+#                 dt_.strptime(date_string, format)
+#             except ValueError: #the format of date inserted is not correct
+#                 return render_template('create_user.html',form=form,error="Please enter a valid date of birth in the format dd/mm/yyyy!")
+#             #Check the validity of date of birth (no dates less than 1900, no dates higher than last year
+#             datetime_object = dt_.strptime(form.date_of_birth.data, '%d/%m/%Y')
+#             my_1_year_ago = dt_.now() - timedelta(days=365)
+#             if datetime_object > my_1_year_ago or datetime_object < dt_(1900,1,1):
+#                 return render_template('create_user.html',form=form,error="Please enter a valid date of birth!")            
+#             # Setting the user fields and add user to DB
+#             new_user.set_password(form.password.data)
+#             new_user.set_dateOfBirth(datetime_object) #setting the date correctly
+#             db.session.add(new_user)
+#             db.session.commit()
+#             return redirect('/')
+#     elif request.method == 'GET':
+#         return render_template('create_user.html', form=form)
+# '''
 
 
 
