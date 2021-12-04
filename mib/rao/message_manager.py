@@ -5,6 +5,7 @@ from flask import abort
 from mib.auth.message import Message
 import requests
 import json
+import base64
 
 class MessageManager:
     MESSAGES_ENDPOINT = app.config['MESSAGES_MS_URL']
@@ -19,11 +20,10 @@ class MessageManager:
         :return: Message obj with id=message_id
         """
         try:
-            response = requests.get("%s/message/%d" % (cls.USERS_ENDPOINT, message_id),
+            response = requests.get("%s/message/%d" % (cls.MESSAGES_ENDPOINT, message_id),
                                     timeout=cls.REQUESTS_TIMEOUT_SECONDS)
             json_payload = response.json()
             if response.status_code == 200:
-                # user is authenticated
                 message = Message.build_from_json(json_payload)
             else:
                 raise RuntimeError('Server has sent an unrecognized status code %s' % response.status_code)
@@ -73,6 +73,7 @@ class MessageManager:
         :param request: the flask request
         :return: message result
         """
+
         try:
             try: 
                 # Get images previously uploaded that needs to be deleted
@@ -88,14 +89,26 @@ class MessageManager:
                 msg_id = request.form["message_id"]
             except KeyError:
                 msg_id = 0
+
+            raw_images = []
+            mimetypes = []
+            # converting images to base64
+            for image in request.files:
+                binary_file_data = request.files[image].read()
+                base64_encoded_data = base64.b64encode(binary_file_data)
+                base64_message = base64_encoded_data.decode('utf-8')
+                raw_images.append(raw_images)
+                mimetypes.append(request.files[image].mimetype)
+
             response = requests.post("%s/message/draft" % (cls.MESSAGES_ENDPOINT),
-                                    files=request.files,
                                     json={
                                         "payload":request.form['payload'],
                                         "delete_image_ids": image_id_to_delete,
                                         "delete_user_ids": user_id_to_delete,
                                         "message_id": msg_id,
-                                        "sender": sender_id
+                                        "sender": sender_id,
+                                        "raw_images": raw_images,
+                                        "mimetypes": mimetypes
                                         },
                                     timeout=cls.REQUESTS_TIMEOUT_SECONDS,
                                     )

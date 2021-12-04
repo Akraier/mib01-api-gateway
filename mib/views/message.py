@@ -294,16 +294,17 @@ def message_view_draft(message_id):
     _picture = db.session.query(Images).filter(Images.message==_id).all()"""
     _message = MessageManager.get_message_by_id(message_id)
     _receivers = _message.__getattr__('receivers')
-    _picture = MessageManager.get_images(message_id)
+    _pictures = MessageManager.get_images(message_id)
 
     if _message.__getattr__('sender') == current_user.id:
         l = []
         image_ids = []
-        if len(_picture) > 0:
-            for row in _picture:
-                image = base64.b64encode(row.image).decode('ascii')
+        if len(_pictures) > 0:
+            for k in _pictures:
+                image = _pictures[k]['image']
+                #image = base64.b64encode().decode('ascii')
                 l.append(image)
-                image_ids.append(row.id)
+                image_ids.append( _pictures[k]['id'])
         return render_template('message_view_edit_draft.html',message = _message, pictures=json.dumps(l),image_ids=image_ids,receivers=_receivers) 
     else:
         return redirect('/')
