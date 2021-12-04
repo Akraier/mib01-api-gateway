@@ -306,3 +306,18 @@ paths:
       responses:
         302:
           description: Redirects to the correct profile page, depending on the type of the user
+  /edit/{message_id}:
+    get:
+        tags: [ Draft ]
+        description: Allow user to modify drafted messages
+        parameters:
+          - name: message_id
+            description: Message Unique ID
+            in: path
+            required: true
+            schema:
+              type: integer
+              format: int64
+        responses:
+          200:
+            description: Correct edit draft message

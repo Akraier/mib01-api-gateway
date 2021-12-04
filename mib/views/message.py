@@ -286,28 +286,28 @@ def message_draft():
 #        return redirect('/')
 #
 #
-#@message.route('/edit/<_id>',methods=['GET'])
-#def message_view_draft(_id):
-#    if current_user is not None and hasattr(current_user, 'id'):
-#        _message = db.session.query(Messages.title, Messages.content,Messages.id,Messages.sender, Messages.date_of_delivery, Messages.font).filter(Messages.id==_id).first()
-#        _receivers = db.session.query(User.id, User.email, User.firstname, User.lastname , Messages.id).join(User, Messages.receivers).filter(Messages.id == _message.id).all()
-#        _picture = db.session.query(Images).filter(Images.message==_id).all()
-#        if _message.sender ==current_user.id:
-#            l = []
-#            image_ids = []
-#            if len(_picture) > 0:
-#                for row in _picture:
-#                    image = base64.b64encode(row.image).decode('ascii')
-#                    l.append(image)
-#                    image_ids.append(row.id)
-#            return render_template('message_view_edit_draft.html',message = _message, pictures=json.dumps(l),image_ids=image_ids,receivers=_receivers) 
-#        else:
-#            return redirect('/')
-#    else:
-#        return redirect('/')
-#
-#
-#                                             
+@message.route('/edit/<_id>',methods=['GET'])
+@login_required
+def message_view_draft(message_id):
+    """_message = db.session.query(Messages.title, Messages.content,Messages.id,Messages.sender, Messages.date_of_delivery, Messages.font).filter(Messages.id==message_id).first()
+    _receivers = db.session.query(User.id, User.email, User.firstname, User.lastname , Messages.id).join(User, Messages.receivers).filter(Messages.id == _message.id).all()
+    _picture = db.session.query(Images).filter(Images.message==_id).all()"""
+    _message = MessageManager.get_message_by_id(message_id)
+    _receivers = _message.__getattr__('receivers')
+    _picture = MessageManager.get_images(message_id)
+
+    if _message.__getattr__('sender') == current_user.id:
+        l = []
+        image_ids = []
+        if len(_picture) > 0:
+            for row in _picture:
+                image = base64.b64encode(row.image).decode('ascii')
+                l.append(image)
+                image_ids.append(row.id)
+        return render_template('message_view_edit_draft.html',message = _message, pictures=json.dumps(l),image_ids=image_ids,receivers=_receivers) 
+    else:
+        return redirect('/')
+                                           
 @message.route('/messages/send',methods=['GET'])
 @login_required
 def messages_send():
