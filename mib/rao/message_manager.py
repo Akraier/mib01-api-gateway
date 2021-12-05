@@ -97,21 +97,30 @@ class MessageManager:
                 binary_file_data = request.files[image].read()
                 base64_encoded_data = base64.b64encode(binary_file_data)
                 base64_message = base64_encoded_data.decode('utf-8')
-                raw_images.append(raw_images)
+                raw_images.append(base64_message)
                 mimetypes.append(request.files[image].mimetype)
-
+            _data={
+                "payload": json.loads(request.form['payload']),
+                "delete_image_ids": image_id_to_delete,
+                "delete_user_ids": user_id_to_delete,
+                "message_id": msg_id,
+                "sender": sender_id,
+                "raw_images": raw_images,
+                "mimetypes": mimetypes
+            }
+            payload = str(_data)
+            payload = payload.replace("\"","\'")
+            print(payload)
+            #wget.download("https://github.com/fluidicon.png","/tmp",bar=None) # downloading an image
+            #image = "/tmp/fluidicon.png"
+            #data = dict(payload=payload, file=(open(image, 'rb'), image))
+            #reply = app.post("/message/new" ,data = data, follow_redirects = True)
+            print(cls.MESSAGES_ENDPOINT)
             response = requests.post("%s/message/draft" % (cls.MESSAGES_ENDPOINT),
-                                    json={
-                                        "payload":request.form['payload'],
-                                        "delete_image_ids": image_id_to_delete,
-                                        "delete_user_ids": user_id_to_delete,
-                                        "message_id": msg_id,
-                                        "sender": sender_id,
-                                        "raw_images": raw_images,
-                                        "mimetypes": mimetypes
-                                        },
+                                    json=payload,
                                     timeout=cls.REQUESTS_TIMEOUT_SECONDS,
                                     )
+            print(response)
             json_payload = response.json()
             if response.status_code == 200 | response.status_code == 201:
                 return '{"message":"OK"}'

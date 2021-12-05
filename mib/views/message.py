@@ -4,6 +4,7 @@ from werkzeug.utils import redirect
 from datetime import date, datetime, timedelta
 from flask_login import (login_user, login_required, current_user)
 from mib.rao.message_manager import MessageManager
+from mib.rao.user_manager import UserManager
 
 import json
 
@@ -285,7 +286,7 @@ def message_draft():
 #    else:
 #        return redirect('/')
 #
-#
+
 @message.route('/edit/<_id>',methods=['GET'])
 @login_required
 def message_view_draft(message_id):
@@ -317,48 +318,48 @@ def messages_send():
     
     return render_template('get_msg_send_draft.html',draft=list(response.get("_draft")),send=list(response.get("_sent")))
 
-#
-## get the list of messages received until now
-#@message.route('/messages', methods=['GET'])
-#def messages():
-#    #check user exist and that is logged in
-#    if current_user is not None and hasattr(current_user, 'id'):
-#
-#        #checking the content
-#        filter = db.session.query(User.filter_isactive).filter(User.id==current_user.id).first()
-#        _messages = ""
-#        if filter[0]==False:
-#            blacklistSQ = db.session.query(blacklist.c.black_id).filter(blacklist.c.user_id == current_user.id).subquery()
-#            
-#            User1 = aliased(User)   #Receiver table   
-#            User2 = aliased(User)   #Sender table
-#            
-#            _messages = db.session.query(Messages.id,Messages.title,Messages.date_of_delivery,Messages.sender,User2.firstname,msglist.c.user_id,User1.filter_isactive,Messages.bad_content)\
-#            .filter(msglist.c.user_id==User1.id,msglist.c.msg_id==Messages.id) \
-#            .filter(User1.id==current_user.id) \
-#            .filter(User2.id == Messages.sender)\
-#            .filter(Messages.date_of_delivery <= datetime.now(),Messages.is_draft==False) \
-#            .filter(Messages.sender.notin_(blacklistSQ))
-#
-#        else:
-#            
-#            blacklistSQ = db.session.query(blacklist.c.black_id).filter(blacklist.c.user_id == current_user.id).subquery()
-#            
-#            User1 = aliased(User)   #Receiver table   
-#            User2 = aliased(User)   #Sender table
-#            
-#            _messages = db.session.query(Messages.id,Messages.title,Messages.date_of_delivery,Messages.sender,User2.firstname,msglist.c.user_id,User1.filter_isactive,Messages.bad_content)\
-#            .filter(msglist.c.user_id==User1.id,msglist.c.msg_id==Messages.id) \
-#            .filter(User1.id==current_user.id) \
-#            .filter(User2.id == Messages.sender)\
-#            .filter(Messages.date_of_delivery <= datetime.now(),Messages.is_draft==False) \
-#            .filter(Messages.sender.notin_(blacklistSQ)) \
-#            .filter(Messages.bad_content==False)
-#
-#
-#        return render_template("get_msg.html", messages = _messages)
-#    else:
-#        return redirect("/")
+
+# get the list of messages received until now
+@message.route('/messages', methods=['GET'])
+@login_required
+def messages():
+    _user = UserManager.get_user_by_id(current_user.id)
+    print("USER: \n")
+    print(_user)
+    filter = _user.__getattr__('filter_isactive')
+    print("FILTER: \n")
+    print(filter)
+    _messages = ""
+    #if filter == False:
+    #    blacklistSQ = db.session.query(blacklist.c.black_id).filter(blacklist.c.user_id == current_user.id).subquery()
+    #    
+    #    User1 = aliased(User)   #Receiver table   
+    #    User2 = aliased(User)   #Sender table
+    #    
+    #    _messages = db.session.query(Messages.id,Messages.title,Messages.date_of_delivery,Messages.sender,User2.firstname,msglist.c.user_id,User1.filter_isactive,Messages.bad_content)\
+    #    .filter(msglist.c.user_id==User1.id,msglist.c.msg_id==Messages.id) \
+    #    .filter(User1.id==current_user.id) \
+    #    .filter(User2.id == Messages.sender)\
+    #    .filter(Messages.date_of_delivery <= datetime.now(),Messages.is_draft==False) \
+    #    .filter(Messages.sender.notin_(blacklistSQ))
+
+    #else:
+    #    
+    #    blacklistSQ = db.session.query(blacklist.c.black_id).filter(blacklist.c.user_id == current_user.id).subquery()
+    #    
+    #    User1 = aliased(User)   #Receiver table   
+    #    User2 = aliased(User)   #Sender table
+    #    
+    #    _messages = db.session.query(Messages.id,Messages.title,Messages.date_of_delivery,Messages.sender,User2.firstname,msglist.c.user_id,User1.filter_isactive,Messages.bad_content)\
+    #    .filter(msglist.c.user_id==User1.id,msglist.c.msg_id==Messages.id) \
+    #    .filter(User1.id==current_user.id) \
+    #    .filter(User2.id == Messages.sender)\
+    #    .filter(Messages.date_of_delivery <= datetime.now(),Messages.is_draft==False) \
+    #    .filter(Messages.sender.notin_(blacklistSQ)) \
+    #    .filter(Messages.bad_content==False)
+
+
+    return render_template("get_msg.html", messages = _messages)
 #
 ##forward message to other user that are not already in the messagelist
 #@message.route('/message/forward',methods=['POST'])
