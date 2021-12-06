@@ -20,11 +20,12 @@ def lucky_number():
     lottery_infos = LotteryManager.retrieve_by_id(current_user.id)
     if lottery_infos is None: #no row for the user (error!)
         return render_template('lottery_board.html', action = 'Some error occurred')
-    
+    print("LOTTERY INFO    ")
+    print(lottery_infos)
     if lottery_infos['ticket_number'] != -1:
-        return render_template('lottery_board.html',action = "You already select the number. This is your number: "+ str(lottery_infos['ticket_number'])+"!") 
+        return render_template('lottery_board.html',action = "You already select the number. This is your number: "+ str(lottery_infos['ticket_number'])+"!",points = lottery_infos['points']) 
     else:
-        return render_template('lottery_board.html',action = "You have selected no number yet, hurry up! Luck is not waiting for you!")
+        return render_template('lottery_board.html',action = "You have selected no number yet, hurry up! Luck is not waiting for you!", points = lottery_infos['points'])
     
 
 # This route is necessary to allow user to select a number for the next lottery extraction.
@@ -32,8 +33,19 @@ def lucky_number():
 @lottery.route('/lottery/<number_>',methods = ['POST'])
 @login_required
 def play(number_):
-    
+    print("**************************")
+    print("**************************")
+    print("**************************")
+    print("**************************")
+    print("**************************")
+
     print("HELLOOOOOOOOOOO")
+    print("**************************")
+    print("**************************")
+    print("**************************")
+    print("**************************")
+
+
     #guess a number for lottery
     last_day = 15 #last day of the month useful to select a number
     number = int(number_)
