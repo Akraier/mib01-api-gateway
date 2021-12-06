@@ -67,23 +67,24 @@ class MessageManager:
             return abort(500)
 
     @classmethod
-    def save_draft(cls, request, sender_id):
+    def create_message(cls, request, sender_id, isDraft):
         """
         This method contacts the message microservice
         and let creation of a new draft message.
         :param request: the flask request
+        :param sender_id: id of the sender
         :return: message result
         """
 
         try:
             try: 
                 # Get images previously uploaded that needs to be deleted
-                image_id_to_delete = request.form['delete_image_ids']
+                image_id_to_delete = list(map(int, json.loads(request.form['delete_image_ids'])))
             except KeyError:
                 image_id_to_delete = []
             try:
                 # Get users previously uploaded that needs to be deleted
-                user_id_to_delete = request.form['delete_user_ids']
+                user_id_to_delete = list(map(int, json.loads(request.form['delete_user_ids'])))
             except KeyError:
                 user_id_to_delete = []
             try: 
@@ -100,6 +101,7 @@ class MessageManager:
                 base64_message = base64_encoded_data.decode('utf-8')
                 raw_images.append(base64_message)
                 mimetypes.append(request.files[image].mimetype)
+
             _data={
                 'payload': json.loads(request.form['payload']),
                 'delete_image_ids': image_id_to_delete,
@@ -109,41 +111,24 @@ class MessageManager:
                 'raw_images': raw_images,
                 'mimetypes': mimetypes
             }
-            #payload = str(_data)
-            #payload = payload.replace("\"","\'")
-            #print(payload)
-            #get_data = json.loads(request.form['payload'])
-            #payload = str({"destinator": get_data["destinator"],
-            #            "title":get_data["title"],"date_of_delivery":get_data["date_of_delivery"],
-            #            "time_of_delivery":get_data["time_of_delivery"],"content":get_data["content"],"font":get_data["font"]})
-            #
-            #payload = payload.replace("\'","\"")
-            #userToDelete = user_id_to_delete
-            #imageToDelete = image_id_to_delete
-            #print(request.form['payload'])
-            #data = dict(payload=str(request.form['payload']),sender=sender_id,message_id=msg_id,delete_image_ids=imageToDelete,delete_user_ids=userToDelete)
-            #print(data)
-            #files = {}
-            #for image in request.files:
-            #    files["file"+image] = request.files[image]
-            #files = {'file1': open('report.xls', 'rb'), 'file2': open('otherthing.txt', 'rb')}
-            #r = requests.post('http://httpbin.org/post', files=files)
-            ##data = dict(payload=payload)
-            #print(data)
-            print(_data)
-            response = requests.post("%s/message/draft" % (cls.MESSAGES_ENDPOINT),
-                                    json=_data,
-                                    timeout=cls.REQUESTS_TIMEOUT_SECONDS,
-                                    )
-            print(response)
+            
+            if isDraft == True:
+                response = requests.post("%s/message/draft" % (cls.MESSAGES_ENDPOINT),
+                                json=_data,
+                                timeout=cls.REQUESTS_TIMEOUT_SECONDS,
+                            )
+            else:
+                response = requests.post("%s/message/send" % (cls.MESSAGES_ENDPOINT),
+                                json=_data,
+                                timeout=cls.REQUESTS_TIMEOUT_SECONDS,
+                            )
             json_payload = response.json()
-            if response.status_code == 200 | response.status_code == 201:
+            print(json_payload)
+            if response.status_code == 200 or response.status_code == 201:
                 return '{"message":"OK"}'
             elif response.status_code == 400:
-                return '{"message":"KO"}'
+                return json_payload
             else:
                 raise RuntimeError('Server has sent an unrecognized status code %s' % response.status_code)
         except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
             return abort(500)
-
-    

@@ -12,19 +12,6 @@ import json
 
 message = Blueprint('message', __name__)
 
-# Check if the message data are correct
-#def verif_data(data):
-#    if len(data["destinator"])>=1: # At least one receiver
-#        if data["date_of_delivery"] != "" and data["time_of_delivery"] != "": #check the oresence of delivery date and time
-#            new_date = data["date_of_delivery"] +" "+data["time_of_delivery"] #concat date and time
-#            delivery = datetime.strptime(new_date,'%Y-%m-%d %H:%M')
-#            if delivery>datetime.today(): #check that delivery date is in future
-#                return "OK"
-#        return "Date not valid"
-#    else:
-#        return "No destinator"
-#
-#
 ##route to withdrow a message (using points earned from lottery)
 #@message.route('/message_withdrow/<msg_id>',methods = ['DELETE'])
 #def withdrow(msg_id):
@@ -68,121 +55,14 @@ def message_new():
     if request.method == 'GET': #return the html page with form to send msg
         return render_template("newmessage.html")
     elif request.method =='POST': #get the values from msg form
-        pass
-#        get_data = json.loads(request.form['payload'])
-#        r = verif_data(get_data) #check on date of delivery
-#        if r=='OK':
-#            #get the values from form fields
-#            list_of_receiver = set(get_data["destinator"])
-#            date_of_delivery = get_data["date_of_delivery"]
-#            time_of_delivery = get_data["time_of_delivery"]
-#            content = get_data["content"]
-#            # Check if fields are valid before send the message
-#            title = get_data["title"]
-#            if title == "":
-#                return '{"message":"Message with empty title"}'
-#            list_of_images = request.files
-#
-#            #REQUEST TO API NEUTRINOAPI BAD CONTENT
-#            import urllib.request,urllib.parse, urllib.error
-#            #content = content+" "+content
-#            
-#            url = 'https://neutrinoapi.net/bad-word-filter'
-#            params = {
-#            'user-id': 'flaskapp10',
-#            'api-key': '6OEjKKMDzj3mwfwLJfRbmiOAXamekju4dQloU95eCAjPYjO1',
-#            'content': content
-#            }
-#
-#
-#            try:
-#                postdata = urllib.parse.urlencode(params).encode()
-#                if url.lower().startswith('http'):
-#                req = urllib.request.Request(url, data=postdata)
-#                response = urllib.request.urlopen(req)
-#                result = json.loads(response.read().decode("utf-8"))
-#            except urllib.error.HTTPError as exception:
-#                return '{"message":"KO"}'
-#
-#            # Check if message was drafted and then sended
-#            try: 
-#                msg_id = request.form["message_id"]
-#            except KeyError:
-#                msg_id = 0
-#
-#            if msg_id != 0:
-#                # message was drafted and then sent
-#                try: 
-#                    # Get images previously uploaded that needs to be deleted
-#                    image_id_to_delete = json.loads(request.form['delete_image_ids'])
-#                except KeyError:
-#                    image_id_to_delete = []
-#                try:
-#                    # Get users previously uploaded that needs to be deleted
-#                    user_id_to_delete = json.loads(request.form['delete_user_ids'])
-#                except KeyError:
-#                    user_id_to_delete = []
-#                message = db.session.query(Messages).filter(Messages.id == msg_id).first()
-#                for id in user_id_to_delete:
-#                    db.session.query(msglist).filter(msglist.c.msg_id == msg_id).filter(msglist.c.user_id == id).delete()
-#                for id in list_of_receiver:
-#                    rec= db.session.query(User).filter(User.id==id).first()
-#                    if rec != None:
-#                        message.receivers.append(rec)
-#                db.session.commit()
-#                new_date = date_of_delivery +" "+time_of_delivery
-#                new_date = datetime.strptime(new_date,'%Y-%m-%d %H:%M')
-#                for image in image_id_to_delete:
-#                    db.session.query(Images).filter(Images.id==image).delete()
-#                    db.session.commit()
-#                for image in list_of_images:
-#                    # adding new images
-#                    img = Images()
-#                    img.image = list_of_images[image].read()
-#                    img.mimetype = list_of_images[image].mimetype
-#                    img.message = msg_id
-#                    db.session.add(img)
-#                db.session.commit()
-#                stmt = (
-#                    update(Messages).
-#                    where(Messages.id==int(msg_id)).
-#                    values(title=title, content=content,date_of_delivery=new_date,is_draft=False)
-#                )
-#                db.session.execute(stmt)
-#                db.session.commit()
-#                return '{"message":"OK"}'
-#
-#            #Creating new Message
-#            msg = Messages()
-#            msg.sender= current_user.id
-#            msg.title = title
-#            msg.content = content
-#            new_date = date_of_delivery +" "+time_of_delivery
-#            msg.date_of_delivery = datetime.strptime(new_date,'%Y-%m-%d %H:%M')
-#            msg.font = get_data["font"]
-#            #Setting the message (bad content filter) in database
-#            if(result['is-bad']==True):
-#                msg.bad_content=True
-#                msg.number_bad = len(result["bad-words-list"])
-#            else:
-#                msg.bad_content=False
-#                msg.number_bad = 0
-#
-#            for id in list_of_receiver:
-#                rec= db.session.query(User).filter(User.id==id).first()
-#                if rec != None:
-#                    msg.receivers.append(rec)
-#            #add message
-#            db.session.add(msg)
-#            db.session.commit()
-#            for image in list_of_images:
-#                img = Images()
-#                img.image = list_of_images[image].read()
-#                img.mimetype = list_of_images[image].mimetype
-#                img.message = msg.get_id()
-#                db.session.add(img)
-#            db.session.commit()
-#        return '{"message":"'+r+'"}'
+        message = MessageManager.create_message(request,current_user.id,isDraft=False)
+        return message
+
+# Route to success send messages
+@message.route('/message/send')
+@login_required
+def message_send():
+    return render_template("message_send_response.html")
 
 #route to have a draft msg
 @message.route('/message/draft',methods = ['GET','POST'])
@@ -193,7 +73,7 @@ def message_draft():
     if request.method == 'GET':
         return render_template("message_draft_response.html")
     else:
-        message = MessageManager.save_draft(request,current_user.id)
+        message = MessageManager.create_message(request,current_user.id,isDraft=True)
         return message
 
 
@@ -267,52 +147,48 @@ def message_draft():
 #    return render_template('replymessage.html',new_msg=2,reply=_reply)
 #
 #
-#@message.route('/message/view_send/<_id>',methods=['GET'])
-#def message_view_send(_id):
-#    if current_user is not None and hasattr(current_user, 'id'):
-#        _message = db.session.query(Messages.title, Messages.content,Messages.id,Messages.sender,Messages.font).filter(Messages.id==_id).first()
-#        _receivers = db.session.query(User.id, User.email, User.firstname, User.lastname , Messages.id).join(User, Messages.receivers).filter(Messages.id == _message.id).all()
-#        _picture = db.session.query(Images).filter(Images.message==_id).all()
-#        if _message.sender ==current_user.id:
-#            l = []
-#            if len(_picture) > 0:
-#                for row in _picture:
-#                    image = base64.b64encode(row.image).decode('ascii')
-#                    l.append(image)
-#            
-#            return render_template('message_view_send.html',message = _message,receivers=_receivers, pictures=json.dumps(l)) 
-#        else:
-#            return redirect('/')
-#    else:
-#        return redirect('/')
-#
-
-@message.route('/edit/<int:message_id>',methods=['GET'])
+@message.route('/message/view_send/<int:id>',methods=['GET'])
 @login_required
-def message_view_draft(message_id):
-    """_message = db.session.query(Messages.title, Messages.content,Messages.id,Messages.sender, Messages.date_of_delivery, Messages.font).filter(Messages.id==message_id).first()
-    _receivers = db.session.query(User.id, User.email, User.firstname, User.lastname , Messages.id).join(User, Messages.receivers).filter(Messages.id == _message.id).all()
-    _picture = db.session.query(Images).filter(Images.message==_id).all()"""
-    _message = MessageManager.get_message_by_id(message_id)
+def message_view_send(id):
+    _message = MessageManager.get_message_by_id(id)
     receiver_list = []
-    for id in _message.receivers:
-        receiver_list.append(UserManager.get_user_by_id(id))
-    _pictures = MessageManager.get_images(message_id)
-
+    for elem in _message.receivers:
+        receiver_list.append(UserManager.get_user_by_id(elem))
+    _pictures = MessageManager.get_images(id)
     if _message.sender == current_user.id:
         l = []
         image_ids = []
         if len(_pictures) > 0:
             for i in range(0,len(_pictures)):
-                image = _pictures[str(i+1)]['image']
-                #image = base64.b64encode().decode('ascii')
+                image = _pictures[str(i)]['image']
                 l.append(image)
-                image_ids.append( _pictures[str(i+1)]['id'])
+                image_ids.append( _pictures[str(i)]['id'])
+        return render_template('message_view_send.html',message = _message,receivers=receiver_list, pictures=json.dumps(l)) 
+    else:
+        return redirect('/')
+
+
+@message.route('/edit/<int:message_id>',methods=['GET'])
+@login_required
+def message_view_draft(message_id):
+    _message = MessageManager.get_message_by_id(message_id)
+    receiver_list = []
+    for id in _message.receivers:
+        receiver_list.append(UserManager.get_user_by_id(id))
+    _pictures = MessageManager.get_images(message_id)
+    if _message.sender == current_user.id:
+        l = []
+        image_ids = []
+        if len(_pictures) > 0:
+            for i in range(0,len(_pictures)):
+                image = _pictures[str(i)]['image']
+                l.append(image)
+                image_ids.append( _pictures[str(i)]['id'])
         return render_template('message_view_edit_draft.html',message = _message, pictures=json.dumps(l),image_ids=image_ids,receivers=receiver_list) 
     else:
         return redirect('/')
                                            
-@message.route('/messages/send',methods=['GET'])
+@message.route('/messages/sent',methods=['GET'])
 @login_required
 def messages_send():
         

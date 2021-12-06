@@ -4,7 +4,7 @@
     <script>list_destinator = []</script>
     <div class="card">
       <div class="card-header">
-        <a href="/messages/send" class="btn btn-link"><button class="btn btn-link"><i class="icon icon icon-arrow-left"></i></button></a>
+        <a href="/messages/sent" class="btn btn-link"><button class="btn btn-link"><i class="icon icon icon-arrow-left"></i></button></a>
         <div style="float: right;">
           <button class="btn btn-error tooltip" data-tooltip="Delete message" onclick="openmodal('delete_modal')"><i class="icon icon icon-delete"></i></button> </div>
           <dl>
@@ -37,10 +37,10 @@
               {% for receiver in receivers: %}
               <script>
                 new_user_name = '{{receiver.firstname}}' + " " + '{{ receiver.lastname}}' + " " + '{{ receiver.email}}';
-                new_user_id = '{{receiver[0]}}';
+                new_user_id = '{{receiver.id}}';
                 destinators = document.querySelector('#list_dest');
-                list_destinator.push(new_user_id);
-                destinators.innerHTML =destinators.innerHTML+'<div class="chip" onclick="opendraftUser(this)" id={{receiver[0]}} style="cursor: pointer;">'+new_user_name+'</div>';
+                list_destinator.push(parseInt(new_user_id));
+                destinators.innerHTML =destinators.innerHTML+'<div class="chip" onclick="opendraftUser(this)" id={{receiver.id}} style="cursor: pointer;">'+new_user_name+'</div>';
               </script>
               {% endfor %}
               <dt><label for="title">Title</label></dt>
@@ -163,7 +163,7 @@
       var i = 0
        list.forEach(function(item){
         document.querySelector("#image").innerHTML = "<div id="+list_image_ids[i]+" style=\"margin-top: 1%;\"> <img class=\" img-responsive\"src=\"data:;base64,"+item
-          +"\" style=\"cursor: pointer;\" onclick=\"opendraft(this)\"/> </div>" + document.querySelector("#image").innerHTML
+          +"\" style=\"cursor: pointer;\" onclick=\"opendraft(this)\"/> </div><br><br>" + document.querySelector("#image").innerHTML
         i=i+1
         });
       
@@ -199,7 +199,7 @@
     theUrl = '/message_withdrow/'+msg_id;
     xmlHttp.open( "DELETE", theUrl, false);
     xmlHttp.send(null);
-    window.location.replace("/messages/send");
+    window.location.replace("/messages/sent");
   } 
    
    function sendmessage(){

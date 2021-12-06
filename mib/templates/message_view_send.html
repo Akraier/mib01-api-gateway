@@ -3,7 +3,7 @@
     <h1>Message send</h1>
     <div class="card">
       <div class="card-header">
-        <a href="/messages/send" class="btn btn-link"><button class="btn btn-link"><i class="icon icon icon-arrow-left"></i></button></a>
+        <a href="/messages/sent" class="btn btn-link"><button class="btn btn-link"><i class="icon icon icon-arrow-left"></i></button></a>
         <div style="float: right;">
           <button class="btn btn-error tooltip" data-tooltip="Delete message" onclick="openmodal()"><i class="icon icon icon-delete"></i></button> </div>
           <div class="content" style="margin-top: 3%;margin-left: 3%;">
@@ -62,7 +62,7 @@
     theUrl = '/message_withdrow/'+msg_id;
     xmlHttp.open( "DELETE", theUrl, false);
     xmlHttp.send(null);
-    window.location.replace("/messages/send");
+    window.location.replace("/messages/sent");
    }
     </script>
   {%endblock%}

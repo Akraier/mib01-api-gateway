@@ -15,7 +15,7 @@ class Message():
     @staticmethod
     def build_from_json(json: dict):
         print("BUILD MESSAGE FROM JSON -->")
-        kw = {key: json[key] for key in ['id', 'sender', 'title', 'content', 'date_of_delivery', 'receivers']}
+        kw = {key: json[key] for key in ['id', 'sender', 'title', 'content', 'date_of_delivery', 'font', 'receivers']}
         extra = json.copy()
         all(map(extra.pop, kw))
         kw['extra'] = extra
@@ -30,6 +30,7 @@ class Message():
         self.title = kw["title"]
         self.content = kw["content"]
         self.date_of_delivery = kw["date_of_delivery"]
+        self.font = kw["font"]
         self.receivers = kw["receivers"]
         self.extra_data = kw['extra']
 
