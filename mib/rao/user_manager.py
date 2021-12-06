@@ -26,6 +26,8 @@ class UserManager:
             if response.status_code == 200:
                 # user is authenticated
                 user = User.build_from_json(json_payload)
+            elif response.status_code == 404:
+                return None
             else:
                 raise RuntimeError('Server has sent an unrecognized status code %s' % response.status_code)
 

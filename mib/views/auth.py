@@ -23,10 +23,10 @@ def login():
     form = LoginForm()
     error= ""
     code = 200
-    if form.validate_on_submit():
+    if form.is_submitted():
         email, password = form.data['email'], form.data['password'] #getting data from form
         user = UserManager.authenticate_user(email, password)
-        
+        print(user)
         if user is not None: #check that user exists
             if user.ban_expired_date is None: #check ban on user
                 login_user(user)

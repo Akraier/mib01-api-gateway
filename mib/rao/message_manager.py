@@ -78,16 +78,16 @@ class MessageManager:
         try:
             try: 
                 # Get images previously uploaded that needs to be deleted
-                image_id_to_delete = json.loads(request.form['delete_image_ids'])
+                image_id_to_delete = request.form['delete_image_ids']
             except KeyError:
                 image_id_to_delete = []
             try:
                 # Get users previously uploaded that needs to be deleted
-                user_id_to_delete = json.loads(request.form['delete_user_ids'])
+                user_id_to_delete = request.form['delete_user_ids']
             except KeyError:
                 user_id_to_delete = []
             try: 
-                msg_id = request.form["message_id"]
+                msg_id = int(request.form["message_id"])
             except KeyError:
                 msg_id = 0
 
@@ -109,8 +109,8 @@ class MessageManager:
                 'raw_images': raw_images,
                 'mimetypes': mimetypes
             }
-            payload = str(_data)
-            payload = payload.replace("\"","\'")
+            #payload = str(_data)
+            #payload = payload.replace("\"","\'")
             #print(payload)
             #get_data = json.loads(request.form['payload'])
             #payload = str({"destinator": get_data["destinator"],
@@ -118,18 +118,19 @@ class MessageManager:
             #            "time_of_delivery":get_data["time_of_delivery"],"content":get_data["content"],"font":get_data["font"]})
             #
             #payload = payload.replace("\'","\"")
-            userToDelete = user_id_to_delete
-            imageToDelete = image_id_to_delete
-            print(request.form['payload'])
-            data = dict(payload=str(request.form['payload']),sender=sender_id,message_id=msg_id,delete_image_ids=imageToDelete,delete_user_ids=userToDelete)
-            print(data)
-            files = {}
-            for image in request.files:
-                files["file"+image] = request.files[image]
+            #userToDelete = user_id_to_delete
+            #imageToDelete = image_id_to_delete
+            #print(request.form['payload'])
+            #data = dict(payload=str(request.form['payload']),sender=sender_id,message_id=msg_id,delete_image_ids=imageToDelete,delete_user_ids=userToDelete)
+            #print(data)
+            #files = {}
+            #for image in request.files:
+            #    files["file"+image] = request.files[image]
             #files = {'file1': open('report.xls', 'rb'), 'file2': open('otherthing.txt', 'rb')}
             #r = requests.post('http://httpbin.org/post', files=files)
             ##data = dict(payload=payload)
             #print(data)
+            print(_data)
             response = requests.post("%s/message/draft" % (cls.MESSAGES_ENDPOINT),
                                     json=_data,
                                     timeout=cls.REQUESTS_TIMEOUT_SECONDS,

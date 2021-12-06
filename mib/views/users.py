@@ -85,7 +85,7 @@ def _users_start(s):
     for usr in users:
         if usr['is_active'] == True:
             if usr['firstname'].startswith(s) == True:
-                return  dumps({'id':users[0]['id'],'firstname' : users[0]['firstname'], 'lastname':users[0]['lastname'],'email':users[0]['email']})
+                return  dumps({'id':usr['id'],'firstname' : usr['firstname'], 'lastname':usr['lastname'],'email':usr['email']})
     
     return dumps({})
 

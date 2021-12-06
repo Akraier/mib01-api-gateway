@@ -21,5 +21,6 @@ def admin_required(func):
 @login_manager.user_loader
 def load_user(user_id):
     user = UserManager.get_user_by_id(user_id)
-    user.authenticated = True
+    if user is not None:
+        user.authenticated = True
     return user
