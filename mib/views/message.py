@@ -1,10 +1,11 @@
 import base64
-from flask import Blueprint, render_template, request,abort
+from flask import Blueprint, blueprints, render_template, request,abort
 from werkzeug.utils import redirect 
 from datetime import date, datetime, timedelta
 from flask_login import (login_user, login_required, current_user)
 from mib.rao.message_manager import MessageManager
 from mib.rao.user_manager import UserManager
+from mib.rao.lottery_manager import LotteryManager
 
 import json
 
@@ -12,41 +13,40 @@ import json
 
 message = Blueprint('message', __name__)
 
-##route to withdrow a message (using points earned from lottery)
-#@message.route('/message_withdrow/<msg_id>',methods = ['DELETE'])
-#def withdrow(msg_id):
-#    #route of regrets. Withdrow a message only if you selected a real message and you have enough points to do so
-#    if current_user is not None and hasattr(current_user, 'id'):
-#        msg_exist = db.session.query(Messages.id, Messages.sender,Messages.is_draft , User.lottery_points).filter(Messages.id == msg_id).filter(Messages.sender == current_user.id).filter(User.id == Messages.sender).first()
-#        _send = db.session.query(Messages.id,Messages.title,Messages.date_of_delivery).filter(Messages.sender==current_user.id,Messages.is_draft==False).all()
-#        _draft = db.session.query(Messages.id,Messages.title,Messages.date_of_delivery).filter(Messages.sender==current_user.id,Messages.is_draft==True).all()
-#        
-#        if msg_exist is not None and msg_exist.is_draft == False:
-#            
-#            if msg_exist.lottery_points >= 10:
-#                #this ensure that current_user is the owner of the message and that the message exist
-#                #10 points needed to withdrow a message
-#                msg_row = db.session.query(Messages).filter(Messages.id == msg_id).first()
-#                usr_row = db.session.query(User).filter(User.id == msg_exist.sender).first()
-#                usr_row.lottery_points -= 10
-#                db.session.delete(msg_row)          #delete the whole message from the db 
-#                db.session.commit()
-#                return render_template('get_msg_send_draft.html', draft=_draft, send=_send, action = "Your message has been deleted")
-#
-#            else:
-#                #no enough points to withdrow
-#                return render_template('get_msg_send_draft.html', draft=_draft, send=_send, action = "You need 10 points to withdrow a message. To gain points, try to play lottery!")
-#        elif msg_exist.is_draft == True:
-#            #just delete the draft
-#            delete_ = db.session.query(Messages).filter(Messages.id == msg_id).first()
-#            db.session.delete(delete_)
-#            db.session.commit()
-#            return render_template('get_msg_send_draft.html', draft=_draft, send=_send)
-#        else:
-#            return render_template('get_msg_send_draft.html', draft=_draft, send=_send, action = "Something went wrong...")
-#
-#    else:
-#        return redirect('/')
+#route to withdrow a message (using points earned from lottery)
+@message.route('/message_withdrow/<msg_id>',methods = ['DELETE'])
+@login_required
+def withdrow(msg_id):
+    #route of regrets. Withdrow a message only if you selected a real message and you have enough points to do so
+    _message = MessageManager.get_message_by_id(int(msg_id))
+    all_messages = MessageManager.get_all_messages(current_user.id)
+    if _message == None:
+        return render_template('get_msg_send_draft.html',draft=list(all_messages.get("_draft")),send=list(all_messages.get("_sent")))
+    
+    _sender_user = UserManager.get_user_by_id(_message.sender)
+    _send = list(all_messages.get("_sent"))
+    _draft = list(all_messages.get("_draft"))
+    print("----------------- MESSAGE ------------------")
+    print(_message)
+    if _message.extra_data['is_draft'] == False:
+        
+        _lottery = LotteryManager.retrieve_by_id(current_user.id)
+        print("---------------- LOTTERY ------------------")
+        print(_lottery)
+        if _lottery['points'] >= 10:
+            #10 points needed to withdrow a message
+            response = LotteryManager.update_lottery_points(current_user.id, -10)
+            if response['message'] == "error":
+                return render_template('get_msg_send_draft.html', draft=_draft, send=_send, action = "Something went wrong, retry later")
+            MessageManager.delete_message(msg_id)
+            return render_template('get_msg_send_draft.html', draft=_draft, send=_send, action = "Your message has been deleted")
+        else:
+            #no enough points to withdrow
+            return render_template('get_msg_send_draft.html', draft=_draft, send=_send, action = "You need 10 points to withdrow a message. To gain points, try to play lottery!")
+    else:
+        #just delete the draft
+        MessageManager.delete_message(msg_id)
+        return render_template('get_msg_send_draft.html', draft=_draft, send=_send, action = "Your message has been deleted")
 
 #route used in sending new message
 @message.route('/message/new',methods = ['GET','POST'])
@@ -78,66 +78,40 @@ def message_draft():
 
 
 #select message to be read and access the reading panel or delete it from the list
-#@message.route('/message/<_id>', methods=['GET', 'DELETE'])
-#def select_message(_id):
-#    if request.method == 'GET':
-#        if current_user is not None and hasattr(current_user, 'id'):
-#
-#            _message = db.session.query(Messages.title, Messages.content,Messages.id,Messages.font).filter(Messages.id==_id).first()
-#            _picture = db.session.query(Images).filter(Images.message==_id).all()
-#            user = db.session.query(msglist.c.user_id).filter(msglist.c.msg_id==_id,msglist.c.user_id==current_user.id).first()
-#
-#            #check that the actual recipient of the id message is the current user to guarantee Confidentiality 
-#            if current_user.id == user[0]:
-#                #Convert Binary Large Object in Base64
-#                l = []
-#                
-#                for row in _picture:
-#                   
-#                    image = base64.b64encode(row.image).decode('ascii')
-#                    l.append(image)
-#                
-#                #If it is the first time that the message is read, then notify the sender and update the state
-#                read = db.session.query(msglist.c.read).filter(msglist.c.user_id==current_user.id, msglist.c.msg_id==_id).first()
-#
-#                if(read[0]==False):
-#                    #notify with celery update read status
-#                   
-#                   #Try to notify the sender
-#                   #QoS  TCP/IP one if the redis-queue, is down the notification is sent iff the user reopen the message after  and the service it's ok
-#                    try:
-#                        sender_id = db.session.query(Messages.sender).filter(Messages.id==_id).first()
-#                        notify.delay(sender_id[0], current_user.id, _id)
-#                        stmt = (
-#                        update(msglist).where(msglist.c.msg_id==_id, msglist.c.user_id==current_user.id).values(read=True))
-#
-#                        db.session.execute(stmt)
-#                        db.session.commit()
-#                    except Exception as e:
-#                        abort(404, description="Celery not available")
-#                       
-#                    
-#
-#                return render_template('message_view.html',message = _message, pictures=json.dumps(l),new_msg=2) 
-#            else:
-#                abort(403) #the server is refusing action
-#        else:
-#            return redirect("/")
-#
-#    elif request.method == 'DELETE':
-#        if current_user is not None and hasattr(current_user, 'id'):
-#            
-#            #delete the current message
-#            stmt = (
-#                delete(msglist).
-#                where(msglist.c.msg_id==_id, msglist.c.user_id == current_user.id)
-#                )
-#            db.session.execute(stmt)
-#            db.session.commit()
-#
-#            return '{"delete":"OK"}'
-#        else:
-#            return redirect("/")
+@message.route('/message/<_id>', methods=['GET', 'DELETE'])
+@login_required
+def select_message(_id):
+    if request.method == 'GET':
+        _message = MessageManager.get_message_by_id(int(_id))
+        _pictures = MessageManager.get_images(int(_id))
+        user = MessageManager.get_msglist(_id, current_user.id)
+        sender = UserManager.get_user_by_id(_message.sender)
+        #Getting images
+        l = []
+        image_ids = []
+        if len(_pictures) > 0:
+            for i in range(0,len(_pictures)):
+                image = _pictures[str(i)]['image']
+                l.append(image)
+                image_ids.append( _pictures[str(i)]['id'])
+        
+        #If it is the first time that the message is read, then notify the sender and update the state
+        if(user['read']==False):
+            #notify with celery update read status
+            
+            #Try to notify the sender
+            #QoS  TCP/IP one if the redis-queue, is down the notification is sent iff the user reopen the message after  and the service it's ok
+            try:
+                sender_id = _message.sender
+                response = MessageManager.celery_notify(sender_id)
+            except Exception as e:
+                abort(404, description="Celery not available")
+                
+        return render_template('message_view.html',message = _message, pictures=json.dumps(l), sender=sender) 
+    elif request.method == 'DELETE':
+            #delete the current message
+            MessageManager.delete_receiver(_id, current_user.id)
+            return '{"delete":"OK"}'
 #    
 #
 ## Reply to one message
@@ -202,42 +176,38 @@ def messages_send():
 @login_required
 def messages():
     _user = UserManager.get_user_by_id(current_user.id)
-    print("USER: \n")
-    print(_user)
-    filter = _user.__getattr__('filter_isactive')
-    print("FILTER: \n")
-    print(filter)
+    filter = _user.extra_data['filter_isactive']
     _messages = ""
-    #if filter == False:
-    #    blacklistSQ = db.session.query(blacklist.c.black_id).filter(blacklist.c.user_id == current_user.id).subquery()
-    #    
-    #    User1 = aliased(User)   #Receiver table   
-    #    User2 = aliased(User)   #Sender table
-    #    
-    #    _messages = db.session.query(Messages.id,Messages.title,Messages.date_of_delivery,Messages.sender,User2.firstname,msglist.c.user_id,User1.filter_isactive,Messages.bad_content)\
-    #    .filter(msglist.c.user_id==User1.id,msglist.c.msg_id==Messages.id) \
-    #    .filter(User1.id==current_user.id) \
-    #    .filter(User2.id == Messages.sender)\
-    #    .filter(Messages.date_of_delivery <= datetime.now(),Messages.is_draft==False) \
-    #    .filter(Messages.sender.notin_(blacklistSQ))
+    _blacklist = UserManager.get_blacklist(current_user.id)
+    #checking the content
+    if filter == False:
 
-    #else:
-    #    
-    #    blacklistSQ = db.session.query(blacklist.c.black_id).filter(blacklist.c.user_id == current_user.id).subquery()
-    #    
-    #    User1 = aliased(User)   #Receiver table   
-    #    User2 = aliased(User)   #Sender table
-    #    
-    #    _messages = db.session.query(Messages.id,Messages.title,Messages.date_of_delivery,Messages.sender,User2.firstname,msglist.c.user_id,User1.filter_isactive,Messages.bad_content)\
-    #    .filter(msglist.c.user_id==User1.id,msglist.c.msg_id==Messages.id) \
-    #    .filter(User1.id==current_user.id) \
-    #    .filter(User2.id == Messages.sender)\
-    #    .filter(Messages.date_of_delivery <= datetime.now(),Messages.is_draft==False) \
-    #    .filter(Messages.sender.notin_(blacklistSQ)) \
-    #    .filter(Messages.bad_content==False)
-
-
-    return render_template("get_msg.html", messages = _messages)
+        _messages = MessageManager.get_received_msg(current_user.id, datetime.now().strftime('%Y-%m-%d %H:%M'),filter=False)
+        _filtered_messages = []
+        blacklist_ids = []
+        for elem in _blacklist:
+            blacklist_ids.append(elem['id'])
+        for elem in _messages:
+            try:
+                # if not except, then the sender is in the blacklist
+                blacklist_ids.index(elem['sender'])
+            except ValueError:
+                # the sender is not in the blacklist, message needs to be added in the view
+                _filtered_messages.append(elem)
+    else:
+        _messages = MessageManager.get_received_msg(current_user.id, datetime.now().strftime('%Y-%m-%d %H:%M'),filter=True)
+        _filtered_messages = []
+        blacklist_ids = []
+        for elem in _blacklist:
+            blacklist_ids.append(elem['id'])
+        for elem in _messages:
+            try:
+                # if not except, then the sender is in the blacklist
+                blacklist_ids.index(elem['sender'])
+            except ValueError:
+                # the sender is not in the blacklist, message needs to be added in the view
+                _filtered_messages.append(elem)
+    return render_template("get_msg.html", messages = _filtered_messages)
 #
 ##forward message to other user that are not already in the messagelist
 #@message.route('/message/forward',methods=['POST'])

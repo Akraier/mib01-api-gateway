@@ -1,4 +1,6 @@
 import re
+
+from flask.json import jsonify
 from mib import app
 from flask_login import (logout_user)
 from flask import abort
@@ -26,6 +28,8 @@ class MessageManager:
             print(json_payload)
             if response.status_code == 200:
                 message = Message.build_from_json(json_payload)
+            elif response.status_code == 404:
+                return None
             else:
                 raise RuntimeError('Server has sent an unrecognized status code %s' % response.status_code)
 
@@ -132,3 +136,110 @@ class MessageManager:
                 raise RuntimeError('Server has sent an unrecognized status code %s' % response.status_code)
         except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
             return abort(500)
+    
+    @classmethod
+    def delete_message(cls, message_id):
+        """
+            This method contacts the message microservice
+            to delete a message.
+            :param message_id: id of the message
+            :return: delete result
+        """
+        try:
+            response = requests.delete("%s/message/%d" % (cls.MESSAGES_ENDPOINT, int(message_id)),
+                            timeout=cls.REQUESTS_TIMEOUT_SECONDS,
+                        )
+            json_payload = response.json()
+            if response.status_code == 202:
+                return json_payload
+            else:
+                raise RuntimeError('Server has sent an unrecognized status code %s' % response.status_code)
+        except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
+            return abort(500)
+    
+    @classmethod
+    def get_received_msg(cls, receiver_id, date, filter):
+        """
+            This method contacts the message microservice
+            and retrieve the received messages.
+            :param receiver_id: id of receiver
+            :param date: date for retrive message
+            :param filter: tells if the filter is active or not
+            :return: list of messages
+        """
+        try:
+            _data={
+                'receiver': str(receiver_id),
+                'date': str(date),
+                'filter': filter
+            }
+
+            response = requests.post("%s/messages/received" % (cls.MESSAGES_ENDPOINT),
+                            json=_data,
+                            timeout=cls.REQUESTS_TIMEOUT_SECONDS,
+                        )
+            json_payload = response.json()
+            print(json_payload)
+            if response.status_code == 200:
+                return json_payload
+            elif response.status_code == 400:
+                return json_payload
+            else:
+                raise RuntimeError('Server has sent an unrecognized status code %s' % response.status_code)
+        except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
+            return abort(500)
+    
+    @classmethod
+    def get_msglist(cls, message_id, user_id):
+        """
+            This method contacts the message microservice
+            and retrieve the msglist associated to message_id.
+            :param message_id: id of the message
+            :param user_id: id of the receiver
+            :return: msglist
+        """
+        try:
+
+            response = requests.get("%s/message/list/%d/%d" % (cls.MESSAGES_ENDPOINT, int(message_id), int(user_id)),
+                            timeout=cls.REQUESTS_TIMEOUT_SECONDS,
+                        )
+            json_payload = response.json()
+            print("-------------- MESSAGE LIST ----------------")
+            print(json_payload)
+            if response.status_code == 200:
+                return json_payload
+            else:
+                raise RuntimeError('Server has sent an unrecognized status code %s' % response.status_code)
+        except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
+            return abort(500)
+    
+    @classmethod
+    def delete_receiver(cls, message_id, user_id):
+        """
+            This method contacts the message microservice
+            to delete a message.
+            :param message_id: id of the message
+            :param user_id: id of the receiver to delete
+            :return: delete result
+        """
+        try:
+            response = requests.delete("%s/message/list/%d/%d" % (cls.MESSAGES_ENDPOINT, int(message_id), int(user_id)),
+                            timeout=cls.REQUESTS_TIMEOUT_SECONDS,
+                        )
+            json_payload = response.json()
+            if response.status_code == 200:
+                return json_payload
+            else:
+                raise RuntimeError('Server has sent an unrecognized status code %s' % response.status_code)
+        except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
+            return abort(500)
+
+    @classmethod
+    def celery_notify(cls, sender_id):
+        """# TODO notify.delay(sender_id[0], current_user.id, _id)
+                stmt = (
+                update(msglist).where(msglist.c.msg_id==_id, msglist.c.user_id==current_user.id).values(read=True))
+
+                db.session.execute(stmt)
+                db.session.commit()"""
+        return jsonify({'message': 'OK'})

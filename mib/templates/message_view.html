@@ -8,10 +8,13 @@
           <button class="btn tooltip" data-tooltip="Forward message" onclick="openforward()"><i class="icon icon icon-share"></i></button>
           <button class="btn tooltip" data-tooltip="Reply" onclick="reply()"><i class="icon icon icon-forward"></i></button>
           <button class="btn btn-error tooltip" data-tooltip="Delete message" onclick="openmodal()"><i class="icon icon icon-delete"></i></button> </div>
-    <h2>{{message.title}}</h2>
-    <h6>{{message.sender}} </h6>
+          <h2> Sender </h2> <h4 style="margin-left: 2%;"> {{sender.firstname}} {{sender.lastname}} {{sender.email}} </h4>
+          <h2> Title </h2> <h4 style="margin-left: 2%;"> {{message.title}} </h4>
+          <h2> Content </h2> <h4 font = {{message.font}} style="margin-left: 2%; font-family:font"> {{message.content}} </h4>
+          <h2> Images </h2> <!--<h4 style="margin-left: 2%;"> {{message.content}} </h4> -->
       </div>
-    <div class="card-body" font = {{message.font}} style="white-space: pre-line; font-family: font" id="content"> {{message.content}} 
+      
+    <div class="card-body" style="white-space: pre-line" id="content">
       <div class="card-image" id="image">
      
     </div>
@@ -25,7 +28,7 @@
         </div>
         <div class="modal-body">
           <div class="content">
-            The message will be reove definitly
+            The message will be remove definitly
           </div>
         </div>
         <div class="modal-footer">
