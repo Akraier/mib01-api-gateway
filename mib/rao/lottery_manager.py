@@ -40,4 +40,26 @@ class LotteryManager:
         response = {'status': 'success'}
         return response
     
+    @classmethod
+    def update_lottery_points(cls, id_ : int, val_ : int):
+        try:
+            url = "%s/lottery/update_points" % (cls.LOTTERY_ENDPOINT,str(id_))
+            response = requests.post(url,
+                                    json = {'userid': id_, 'value': val_},
+                                    timeout=cls.REQUESTS_TIMEOUT_SECONDS)
+            json_payload = response.json()
+            print("THE RESPONSE OF POINTS", json_payload)
+            if json_payload['status'] != 'success':
+                return None
+        except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
+            return abort(500)
+
+        response = {'status': 'success'}
+        return response
+
+
+       
+    
+    
+    
     
