@@ -4,7 +4,7 @@ from flask_login import (login_user, login_required, current_user)
 from mib.forms import UserForm, UserModifyForm
 from mib.auth.user import User
 from mib.rao.user_manager import UserManager
-
+from mib.rao.lottery_manager import LotteryManager
 import bcrypt
 from datetime import datetime
 from dateutil.parser import parse
@@ -49,6 +49,12 @@ def create_user():
  
         if response.status_code == 201: 
             # in this case the request is ok! 
+
+            id = response.json()['user']['id']
+            rsp = LotteryManager.create_lottery_row(id) #creating the row in the lottery db
+            
+            print("LOTTERY RESPONSEEEE")
+            print(rsp)
             user = response.json() 
             to_login = User.build_from_json(user["user"]) 
             login_user(to_login) 
