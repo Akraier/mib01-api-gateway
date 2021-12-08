@@ -257,7 +257,6 @@ class UserManager:
        
         try:
             response = requests.get("%s/user/blacklist/%d" % (cls.USERS_ENDPOINT,user_id), timeout=cls.REQUESTS_TIMEOUT_SECONDS)
-            print(response)
             json_payload = response.json()
             if response.status_code == 200:
                 #we have to build a list of User obj

@@ -204,8 +204,6 @@ class MessageManager:
                             timeout=cls.REQUESTS_TIMEOUT_SECONDS,
                         )
             json_payload = response.json()
-            print("-------------- MESSAGE LIST ----------------")
-            print(json_payload)
             if response.status_code == 200:
                 return json_payload
             else:

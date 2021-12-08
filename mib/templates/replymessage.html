@@ -12,7 +12,7 @@
         <div class="form-autocomplete-input form-input" >
           <!-- autocomplete real input box -->
           <div id="list_dest">
-            <div class="chip">{{reply.firstname}} {{reply.lastname}} </div>
+            <div class="chip">{{user.firstname}} {{user.lastname}} </div>
           </div>
           <input class="form-input" type="text" id="destinator" placeholder="Search for destinator">
         </div>
@@ -32,9 +32,17 @@
       </div>
       </dd>
      <dt><label for="title">Title</label></dt>
-     <dd><input id="title" name="title" required="" type="text" value="Re : [{{reply.title}}]" style="width: -moz-available;"></dd>
+     <dd><input id="title" name="title" required="" type="text" value="Re : [{{message.title}}]" style="width: -moz-available;"></dd>
      <dt><label for="images">Upload images</label></dt>
      <dd><input id="images" multiple type="file" name="images" accept="image/*"/></dd>
+     <dt><label for="font">Select your font</label></dt>
+     <select id="font" name="font" onchange="changefont();">
+      <option value = "Times New Roman"> Times New Roman </option>
+      <option value = "Serif"> Serif </option>
+      <option value = "Arial"> Arial </option>
+      <option value = "Sans-Serif"> Sans-Serif </option>                                  
+      <option value = "Helvetica"> Helvetica </option>                      
+    </select></dl>
      <dt><label for="content">Content</label></dt>
      <dd><textarea id="content" name="content" style="width: -moz-available; height: 30%;"></textarea></dd>
     </dl>
@@ -65,6 +73,7 @@
       <div class="modal-footer">
         <button onclick="sendmessage()" class="btn btn-primary" >Send message</button>
         <button onclick="closemodal()" class="btn btn-link" >Close</button>
+        <button onclick="draftmessage()" class="btn btn-link" >Draft</button>
       </div>
     </div>
   </div>
@@ -72,6 +81,13 @@
   {%endblock%}
   {%block script %}
   <script>
+    //font changing
+    function changefont(){
+      var selector = document.getElementById('font');
+      var family = selector.options[selector.selectedIndex].value;
+      var text = document.getElementById('content')
+      text.style.fontFamily = family; 
+    }
     // Reply filling 
     // Code for send the message 
     function sendmessage(){
@@ -81,6 +97,7 @@
         date_of_delivery : document.getElementById("date_of_delivery").value,
         time_of_delivery : document.getElementById("time").value,
         content : document.getElementById("content").value,
+        font : document.getElementById("font").value,
       }
       var images = document.getElementById("images")
       var formData = new FormData();
@@ -108,6 +125,43 @@
           </div> `}
       })
     }
+
+    function draftmessage(){
+      var payload = {
+        destinator :list_destinator,
+        title : document.getElementById("title").value,
+        date_of_delivery : document.getElementById("date_of_delivery").value,
+        time_of_delivery : document.getElementById("time").value,
+        content : document.getElementById("content").value,
+        font : document.getElementById("font").value,
+      }
+      var images = document.getElementById("images")
+      var formData = new FormData();
+      formData.append("payload", JSON.stringify(payload))
+      for(var i=0;i<images.files.length;i++) {
+        formData.append('file'+i, images.files.item(i));    
+      }
+      //checking payload
+      fetch("/message/draft",
+      {
+      method: "POST",
+      body: formData
+      }).then(function(res){ return res.json(); })
+      .then(function(data){
+        if(data["message"]=="OK"){
+          window.location.replace("/message/draft");
+        }
+        else if (data["message"]=="CONTENT FILTER")
+        {
+          window.location.replace("/message/reject")
+        }
+        else{
+        document.querySelector('#return').innerHTML = `<div class="toast toast-error" >
+            Error : `+data["message"]+`
+          </div> `}
+      })
+    }
+
        function openmodal(){
     document.getElementById("date_of_delivery_moda").classList.add('active');
    }
@@ -119,7 +173,7 @@
    var new_user_id;
    var new_user_name;
    var list_destinator=[];
-   list_destinator.push({{reply.sender}})
+   list_destinator.push({{message.sender}})
     input.addEventListener('keyup', updateValue);
     function updateValue(e) {
       if(input.value.length>0){

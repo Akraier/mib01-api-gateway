@@ -26,13 +26,10 @@ def withdrow(msg_id):
     _sender_user = UserManager.get_user_by_id(_message.sender)
     _send = list(all_messages.get("_sent"))
     _draft = list(all_messages.get("_draft"))
-    print("----------------- MESSAGE ------------------")
-    print(_message)
+
     if _message.extra_data['is_draft'] == False:
         
         _lottery = LotteryManager.retrieve_by_id(current_user.id)
-        print("---------------- LOTTERY ------------------")
-        print(_lottery)
         if _lottery['points'] >= 10:
             #10 points needed to withdrow a message
             response = LotteryManager.update_lottery_points(current_user.id, -10)
@@ -112,15 +109,17 @@ def select_message(_id):
             #delete the current message
             MessageManager.delete_receiver(_id, current_user.id)
             return '{"delete":"OK"}'
-#    
-#
-## Reply to one message
-#@message.route('/message/reply/<_id>', methods=['GET'])
-#def reply(_id):
-#    _reply = db.session.query(Messages.sender,Messages.title,User.firstname,User.lastname).filter(Messages.id==_id).filter(User.id==Messages.sender).first()
-#    return render_template('replymessage.html',new_msg=2,reply=_reply)
-#
-#
+    
+
+# Reply to one message
+@message.route('/message/reply/<_id>', methods=['GET'])
+def reply(_id):
+    _message = MessageManager.get_message_by_id(int(_id))
+    _user = UserManager.get_user_by_id(_message.sender)
+
+    return render_template('replymessage.html',message=_message, user=_user)
+
+
 @message.route('/message/view_send/<int:id>',methods=['GET'])
 @login_required
 def message_view_send(id):
