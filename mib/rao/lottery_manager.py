@@ -7,6 +7,18 @@ import json
 class LotteryManager:
     LOTTERY_ENDPOINT = app.config['LOTTERY_MS_URL']
     REQUESTS_TIMEOUT_SECONDS = app.config['REQUESTS_TIMEOUT_SECONDS']
+    @classmethod 
+    def create_lottery_row(cls,id_:int):
+        try:
+            lottery_url = "%s/lottery/%s" % (cls.LOTTERY_ENDPOINT, str(id_)) #TODO a che serve passarlo nell'url se poi lo mandiamo anche come dato della post?
+            response_lottery = requests.post(lottery_url,
+                                    json = {'id': id_},
+                                    timeout=cls.REQUESTS_TIMEOUT_SECONDS
+                                )
+        except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
+            return abort(500)
+        
+        return response_lottery
 
     @classmethod
     def retrieve_by_id(cls, id_:int):
