@@ -336,5 +336,21 @@ class UserManager:
 
         return black_user
 
-
+    @classmethod
+    def report_user(cls, user_id:int):
+        """This method contact the user microservice in order to handle report """
+        try:
+            response = requests.post("%s/report/%d" % (cls.USERS_ENDPOINT,int(user_id)),timeout=cls.REQUESTS_TIMEOUT_SECONDS)
+            json_payload = response.json()
+            if response.status_code == 200:
+                return {'message':'User correctly reported','payload':json_payload}
+            if response.status_code == 201:
+                return {'message':'User banned','payload':json_payload}
+            if response.status_code == 404:
+                return {'message':'User not found','payload':json_payload}
+            else:
+                raise RuntimeError('Server has sent an unrecognized status code %s' % response.status_code)
+        except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
+            return abort(500)
+   
             

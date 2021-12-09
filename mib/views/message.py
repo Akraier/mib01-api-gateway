@@ -180,32 +180,21 @@ def messages():
     _blacklist = UserManager.get_blacklist(current_user.id)
     #checking the content
     if filter == False:
-
+        # show message with bad content
         _messages = MessageManager.get_received_msg(current_user.id, datetime.now().strftime('%Y-%m-%d %H:%M'),filter=False)
-        _filtered_messages = []
-        blacklist_ids = []
-        for elem in _blacklist:
-            blacklist_ids.append(elem['id'])
-        for elem in _messages:
-            try:
-                # if not except, then the sender is in the blacklist
-                blacklist_ids.index(elem['sender'])
-            except ValueError:
-                # the sender is not in the blacklist, message needs to be added in the view
-                _filtered_messages.append(elem)
     else:
         _messages = MessageManager.get_received_msg(current_user.id, datetime.now().strftime('%Y-%m-%d %H:%M'),filter=True)
-        _filtered_messages = []
-        blacklist_ids = []
-        for elem in _blacklist:
-            blacklist_ids.append(elem['id'])
-        for elem in _messages:
-            try:
-                # if not except, then the sender is in the blacklist
-                blacklist_ids.index(elem['sender'])
-            except ValueError:
-                # the sender is not in the blacklist, message needs to be added in the view
-                _filtered_messages.append(elem)
+    _filtered_messages = []
+    blacklist_ids = []
+    for elem in _blacklist:
+        blacklist_ids.append(elem['id'])
+    for elem in _messages:
+        try:
+            # if not except, then the sender is in the blacklist
+            blacklist_ids.index(elem['sender'])
+        except ValueError:
+            # the sender is not in the blacklist, message needs to be added in the view
+            _filtered_messages.append(elem)
     return render_template("get_msg.html", messages = _filtered_messages)
 #
 ##forward message to other user that are not already in the messagelist

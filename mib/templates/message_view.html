@@ -3,11 +3,12 @@
     <h1>Mail box </h1>
     <div class="card">
       <div class="card-header">
-        <a href="/messages" class="btn btn-link"><button class="btn btn-link" "><i class="icon icon icon-arrow-left"></i></button></a>
+        <a href="/messages" class="btn btn-link"><button class="btn btn-link" ><i class="icon icon icon-arrow-left"></i></button></a>
         <div style="float: right;">
           <button class="btn tooltip" data-tooltip="Forward message" onclick="openforward()"><i class="icon icon icon-share"></i></button>
           <button class="btn tooltip" data-tooltip="Reply" onclick="reply()"><i class="icon icon icon-forward"></i></button>
-          <button class="btn btn-error tooltip" data-tooltip="Delete message" onclick="openmodal()"><i class="icon icon icon-delete"></i></button> </div>
+          <button class="btn btn-error tooltip" data-tooltip="Delete message" onclick="openmodal()"><i class="icon icon icon-delete"></i></button> 
+          <button class="btn tooltip" data-tooltip="Report" onclick="openreport()"><i class="icon icon icon-stop"></i></button></div>
           <h2> Sender </h2> <h4 style="margin-left: 2%;"> {{sender.firstname}} {{sender.lastname}} {{sender.email}} </h4>
           <h2> Title </h2> <h4 style="margin-left: 2%;"> {{message.title}} </h4>
           <h2> Content </h2> <h4 font = {{message.font}} style="margin-left: 2%; font-family:font"> {{message.content}} </h4>
@@ -40,6 +41,24 @@
       </div>
     </div>
 
+    <div class="modal " id="report_modal">
+      <a href="#close" class="modal-overlay" aria-label="Close"></a>
+      <div class="modal-container">
+        <div class="modal-header">
+          <a href="#close" class="btn btn-clear float-right" aria-label="Close" onclick="closereportmodal()"></a>
+          <div class="modal-title h5">Are you sure to report this user ?</div>
+        </div>
+        <div class="modal-body">
+          <div class="content">
+            Your report will be taken into account by our team. 
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button onclick="sendreport('{{message.id}}')" class="btn btn-error" >Report</button>
+          <button onclick="closereportmodal()" class="btn btn-link" >Close</button>
+        </div>
+      </div>
+    </div>
 
     <div class="modal " id="date_of_delivery_moda">
       <a href="#close" class="modal-overlay" aria-label="Close"></a>
@@ -144,18 +163,32 @@
    function closemodal(){
     document.getElementById("delete_modal").classList.remove('active');
    }
-   function senddelete(){
+    function senddelete(){
 
-    fetch('/message/'+msg_id,{
-    method:'DELETE'
-    })
-    .then(function(res){ return res.json(); })
-      .then(function(data){
-        if(data["delete"]=="OK"){
-          window.location.replace("/messages");
-        }
+      fetch('/message/'+msg_id,{
+      method:'DELETE'
       })
-   }
+      .then(function(res){ return res.json(); })
+        .then(function(data){
+          if(data["delete"]=="OK"){
+            window.location.replace("/messages");
+          }
+        })
+    }
+    function openreport(){
+      document.getElementById("report_modal").classList.add('active');
+    }
+    function closereportmodal(){
+      document.getElementById("report_modal").classList.remove('active');
+    }
+    function sendreport(msg_id){
+      console.log(msg_id)
+      fetch('/report_user/'+msg_id,
+      {method:'POST'}).then(
+        window.location.replace("/messages")
+      )
+    }
+   
 
    const input = document.querySelector('#destinator');
    var new_user_id;

@@ -179,7 +179,6 @@ class MessageManager:
                             timeout=cls.REQUESTS_TIMEOUT_SECONDS,
                         )
             json_payload = response.json()
-            print(json_payload)
             if response.status_code == 200:
                 return json_payload
             elif response.status_code == 400:
@@ -231,7 +230,24 @@ class MessageManager:
                 raise RuntimeError('Server has sent an unrecognized status code %s' % response.status_code)
         except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
             return abort(500)
-
+    @classmethod 
+    def report_message(cls,msg_id,current_id):
+        """
+            This method contact the message ms in order to report a user
+        """
+        try:
+            response = requests.post("%s/report/%d/%d" % (cls.MESSAGES_ENDPOINT,int(msg_id),int(current_id)),timeout=cls.REQUESTS_TIMEOUT_SECONDS)
+            json_payload = response.json()
+            if response.status_code == 200:
+                return json_payload
+            if response.status_code == 201:
+                return json_payload
+            if response.status_code == 404:
+                return json_payload  
+            else:
+                raise RuntimeError('Server has sent an unrecognized status code %s' % response.status_code)
+        except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
+            return abort(500)
     @classmethod
     def celery_notify(cls, sender_id):
         """# TODO notify.delay(sender_id[0], current_user.id, _id)
