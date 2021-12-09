@@ -241,3 +241,22 @@ class MessageManager:
                 db.session.execute(stmt)
                 db.session.commit()"""
         return jsonify({'message': 'OK'})
+    
+    @classmethod
+    def forward_message(cls,get_data,user_id):
+        try:
+            
+            response = requests.post("%s/message/forward/%d" % (cls.MESSAGES_ENDPOINT,user_id),
+                                json=get_data,
+                                timeout=cls.REQUESTS_TIMEOUT_SECONDS,
+            )
+
+            json_payload = response.json()
+
+            if response.status_code == 200:
+                print(json_payload)
+                return json_payload
+            else:
+                raise RuntimeError('Server has sent an unrecognized status code %s' % response.status_code)
+        except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
+            return abort(500)  
