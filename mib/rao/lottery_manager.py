@@ -10,7 +10,7 @@ class LotteryManager:
     @classmethod 
     def create_lottery_row(cls,id_:int):
         try:
-            lottery_url = "%s/lottery/%s" % (cls.LOTTERY_ENDPOINT, str(id_)) #TODO a che serve passarlo nell'url se poi lo mandiamo anche come dato della post?
+            lottery_url = "%s/lottery/%s" % (cls.LOTTERY_ENDPOINT, str(id_)) 
             response_lottery = requests.post(lottery_url,
                                     json = {'id': id_},
                                     timeout=cls.REQUESTS_TIMEOUT_SECONDS
@@ -26,7 +26,6 @@ class LotteryManager:
             response = requests.get("%s/lottery/%s" % (cls.LOTTERY_ENDPOINT,str(id_)),
                                     timeout=cls.REQUESTS_TIMEOUT_SECONDS)
             json_payload = response.json()
-            print("THE RESPONSE OF GET LOTTERY NUMBER:::::::", json_payload)
             if json_payload['status'] != 'success':
                 return None
         except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
@@ -43,7 +42,6 @@ class LotteryManager:
                                     json = {'val_': val_},
                                     timeout=cls.REQUESTS_TIMEOUT_SECONDS)
             json_payload = response.json()
-            print("THE RESPONSE OF SELECT LOTTERY NUMBER:::::::", json_payload)
             if json_payload['status'] != 'success':
                 return None
         except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):

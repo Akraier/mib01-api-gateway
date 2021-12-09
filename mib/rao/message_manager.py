@@ -127,7 +127,6 @@ class MessageManager:
                                 timeout=cls.REQUESTS_TIMEOUT_SECONDS,
                             )
             json_payload = response.json()
-            print(json_payload)
             if response.status_code == 200 or response.status_code == 201:
                 return '{"message":"OK"}'
             elif response.status_code == 400:
@@ -270,7 +269,6 @@ class MessageManager:
             json_payload = response.json()
 
             if response.status_code == 200:
-                print(json_payload)
                 return json_payload
             else:
                 raise RuntimeError('Server has sent an unrecognized status code %s' % response.status_code)
