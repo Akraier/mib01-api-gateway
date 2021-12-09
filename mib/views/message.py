@@ -197,27 +197,15 @@ def messages():
             _filtered_messages.append(elem)
     return render_template("get_msg.html", messages = _filtered_messages)
 #
-##forward message to other user that are not already in the messagelist
-#@message.route('/message/forward',methods=['POST'])
-#def message_forward():
-#     #check user exist and that is logged in
-#    if current_user is not None and hasattr(current_user, 'id'):
-#        get_data = json.loads(request.form['payload'])
-#        #Add the users in msglist
-#        l = get_data["destinators"]
-#        for el in l:
-#            #Insert Users in msglist
-#            try:
-#                stm = (
-#                    insert(msglist).
-#                    values(msg_id=get_data["messageid"],user_id=el)
-#                )
-#                db.session.execute(stm)
-#                db.session.commit()
-#            except IntegrityError as e:
-#                print("The user is already insert")
-#    else:
-#         return redirect("/")
-#
-#    return '{"status":"OK"}'
-#
+
+
+
+#forward message to other user that are not already in the messagelist
+@message.route('/message/forward',methods=['POST'])
+@login_required
+def message_forward():
+    get_data = json.loads(request.form['payload'])
+    #Add the users in msglist
+    MessageManager.forward_message(get_data,current_user.id)
+    return '{"status":"OK"}'
+    
