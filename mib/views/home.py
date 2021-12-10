@@ -19,27 +19,3 @@ def index():
     else:
         welcome = None
     return render_template("index.html", welcome=welcome,new_msg=_new_msg)
-
-""""
-# Route to download an image an show it on the page    
-@home.route('/image/<int:id>')
-def download_images(id):
-    _image = db.session.query(Images).filter(Images.id == id).first()
-    return Response(_image.image, mimetype=_image.mimetype)
-
-# Route to send messages
-@home.route('/message/send')
-def message_send():
-    if current_user is not None and hasattr(current_user, 'id'):
-        return render_template("message_send_response.html",new_msg=6)
-    else:
-        return redirect('/')
-
-# Route to draft messages
-@home.route('/message/draft')
-def message_reject():
-    if current_user is not None and hasattr(current_user, 'id'):
-        return render_template("message_draft_response.html",new_msg=6)
-    else:
-        return redirect('/')
-"""

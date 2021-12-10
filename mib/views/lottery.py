@@ -20,8 +20,7 @@ def lucky_number():
     lottery_infos = LotteryManager.retrieve_by_id(current_user.id)
     if lottery_infos is None: #no row for the user (error!)
         return render_template('lottery_board.html', action = 'Some error occurred')
-    print("LOTTERY INFO    ")
-    print(lottery_infos)
+    
     if lottery_infos['ticket_number'] != -1:
         return render_template('lottery_board.html',action = "You already select the number. This is your number: "+ str(lottery_infos['ticket_number'])+"!",points = lottery_infos['points']) 
     else:
@@ -33,17 +32,6 @@ def lucky_number():
 @lottery.route('/lottery/<number_>',methods = ['POST'])
 @login_required
 def play(number_):
-    print("**************************")
-    print("**************************")
-    print("**************************")
-    print("**************************")
-    print("**************************")
-
-    print("HELLOOOOOOOOOOO")
-    print("**************************")
-    print("**************************")
-    print("**************************")
-    print("**************************")
 
 
     #guess a number for lottery
@@ -56,10 +44,8 @@ def play(number_):
         if day_of_month <= last_day:
             usr_lottery_row = LotteryManager.retrieve_by_id(current_user.id)
             
-            print("_____--> the rowwwww first::::::", usr_lottery_row)
             
             if usr_lottery_row['ticket_number'] == -1: #user doesn't already choose a number, so now he can. We save in the DB the number selected
-                print("questa è la ROWWWWW _____ ", usr_lottery_row)
                 LotteryManager.update_lottery_number(current_user.id,number)
                 #return render_template('lottery_board.html',action = "You select the number "+str(number)+"! Good Luck!")
                 return redirect('/lottery')

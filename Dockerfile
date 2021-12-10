@@ -2,7 +2,7 @@
 # Docker file for MessageInABottle S01 v1.0
 #
 FROM python:3.8
-LABEL maintainer="MessageInABottle Squad01 API Gateway"
+LABEL maintainer="01_squad"
 LABEL version="1.0"
 LABEL description="MessageInABottle Application Squad01"
 

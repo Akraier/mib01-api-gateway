@@ -26,19 +26,11 @@ def login():
     if form.is_submitted():
         email, password = form.data['email'], form.data['password'] #getting data from form
         user = UserManager.authenticate_user(email, password)
-        print(user)
         if user is not None: #check that user exists
             if user.ban_expired_date is None: #check ban on user
                 login_user(user)
                 return redirect('/')
             elif user.ban_expired_date < datetime.today(): #the ban date has expired, need to set the ban_expired_date to None
-                """"
-                TODO 
-                usr = db.session.query(User).filter(User.email == email).first()
-                usr.ban_expired_date = None
-                db.session.commit()
-                """
-                
                 login_user(user)
                 return redirect('/')
             else: #The account is under ban, so the user can't login

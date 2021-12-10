@@ -66,7 +66,6 @@ class UserManager:
                     birthdate, phone: str):
         try:
             # we need to initialize both the lottery and the user db
-            print(cls.USERS_ENDPOINT)
             usr_url = "%s/create_user" % cls.USERS_ENDPOINT
             response_usr = requests.post(usr_url,
                                      json={
@@ -80,16 +79,6 @@ class UserManager:
                                      timeout=cls.REQUESTS_TIMEOUT_SECONDS
                                      )
             
-            #id = response_usr.json()['user']['id'] #get the user id just created
-            
-            """lottery_url = "%s/lottery/%s" % (cls.LOTTERY_ENDPOINT, str(id)) #TODO a che serve passarlo nell'url se poi lo mandiamo anche come dato della post?
-            response_lottery = requests.post(lottery_url,
-                                     json = {'id': id},
-                                     timeout=cls.REQUESTS_TIMEOUT_SECONDS
-                                    )"""
-
-            """print("STAMPO LA RISPOSTAA di LOTTERYYYYYYYYYYYYY")
-            print(response_lottery.json())"""
             
         except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
             return abort(500)
@@ -99,8 +88,6 @@ class UserManager:
             'status': 'error',
             'message': 'Some error occurred during the registration process',
         }
-        #print("LOTTERY     ",response_lottery)
-        print("USR         ", response_usr)
         #check for errors
         if response_usr.json()['status'] != 'success':
             return null_response
@@ -126,7 +113,7 @@ class UserManager:
                                     },
                                     timeout=cls.REQUESTS_TIMEOUT_SECONDS
                                     )
-            print(response)
+    
             return response
 
         except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
@@ -163,12 +150,10 @@ class UserManager:
         """
         payload = dict(email=email, password=password)
         try:
-            print('trying response....')
             response = requests.post('%s/authenticate' % cls.USERS_ENDPOINT,
                                      json=payload,
                                      timeout=cls.REQUESTS_TIMEOUT_SECONDS
                                      )
-            print('received response....')
             json_response = response.json()
         except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
             # We can't connect to Users MS
@@ -200,7 +185,6 @@ class UserManager:
             json_payload = response.json()
             if response.status_code == 200:
                 #we have to build a list of User obj
-                print(json_payload)
                 list_user = json_payload['users_list']
             else:
                 raise RuntimeError('Server has sent an unrecognized status code %s' % response.status_code)
@@ -234,11 +218,9 @@ class UserManager:
         :return: User updated
         """
         payload = dict(filter = filter_v, id = user_id)
-        print("this is the payload: ", payload)
         try:
             url = "%s/myaccount/set_content" % (cls.USERS_ENDPOINT)
             response = requests.put(url, json = payload, timeout=cls.REQUESTS_TIMEOUT_SECONDS)
-            print("this is the response: ", response)
 
         except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
             return abort(500)
@@ -259,7 +241,6 @@ class UserManager:
             json_payload = response.json()
             if response.status_code == 200:
                 #we have to build a list of User obj
-                print(json_payload)
                 black_user = json_payload['black_list']
             else:
                 raise RuntimeError('Server has sent an unrecognized status code %s' % response.status_code)
@@ -277,11 +258,11 @@ class UserManager:
        
         try:
             response = requests.delete("%s/user/blacklist/%d" % (cls.USERS_ENDPOINT,user_id), timeout=cls.REQUESTS_TIMEOUT_SECONDS)
-            print(response)
+            
             json_payload = response.json()
             if response.status_code == 200:
                 #we have to build a list of User obj
-                print(json_payload)
+                
                 black_user = json_payload['content']
             else:
                 raise RuntimeError('Server has sent an unrecognized status code %s' % response.status_code)
@@ -304,7 +285,7 @@ class UserManager:
             json_payload = response.json()
             if response.status_code == 200:
                 #we have to build a list of User obj
-                print(json_payload)
+                
                 black_user = json_payload['content']
             else:
                 raise RuntimeError('Server has sent an unrecognized status code %s' % response.status_code)
@@ -327,7 +308,7 @@ class UserManager:
             json_payload = response.json()
             if response.status_code == 200:
                 #we have to build a list of User obj
-                print(json_payload)
+                
                 black_user = json_payload['content']
             else:
                 raise RuntimeError('Server has sent an unrecognized status code %s' % response.status_code)
