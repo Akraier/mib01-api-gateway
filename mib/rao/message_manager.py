@@ -249,14 +249,18 @@ class MessageManager:
         except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
             return abort(500)
     @classmethod
-    def celery_notify(cls, sender_id):
-        """# TODO notify.delay(sender_id[0], current_user.id, _id)
-                stmt = (
-                update(msglist).where(msglist.c.msg_id==_id, msglist.c.user_id==current_user.id).values(read=True))
-
-                db.session.execute(stmt)
-                db.session.commit()"""
-        return jsonify({'message': 'OK'})
+    def set_read_message(cls, msg_list_id):
+        try:
+            response = requests.post("%s/notify/%d" % (cls.MESSAGES_ENDPOINT,msg_list_id),
+                                timeout=cls.REQUESTS_TIMEOUT_SECONDS,
+                        )
+            json_payload = response.json()
+            if response.status_code == 200:
+                return json_payload
+            else:
+                raise RuntimeError('Server has sent an unrecognized status code %s' % response.status_code)
+        except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
+            return abort(500)  
     
     @classmethod
     def forward_message(cls,get_data,user_id):

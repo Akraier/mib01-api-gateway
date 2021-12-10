@@ -94,15 +94,7 @@ def select_message(_id):
         
         #If it is the first time that the message is read, then notify the sender and update the state
         if(user['read']==False):
-            #notify with celery update read status
-            
-            #Try to notify the sender
-            #QoS  TCP/IP one if the redis-queue, is down the notification is sent iff the user reopen the message after  and the service it's ok
-            try:
-                sender_id = _message.sender
-                response = MessageManager.celery_notify(sender_id)
-            except Exception as e:
-                abort(404, description="Celery not available")
+            MessageManager.set_read_message(user['id'])
                 
         return render_template('message_view.html',message = _message, pictures=json.dumps(l), sender=sender) 
     elif request.method == 'DELETE':
