@@ -3,7 +3,7 @@
 #
 
 # Flask settings
-FLASK_ENV=production
+FLASK_ENV=development
 APP_SECRET=2929383DmdosfSlsDKfkSl2304ssdfpgmfls302k
 
 # Microservices
